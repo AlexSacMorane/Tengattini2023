@@ -1,6 +1,9 @@
 # Simulation files
 *_report.txt
 
-# Folders
+# Folders created during the simulation
+data
 plot
+save
+vtk
 
