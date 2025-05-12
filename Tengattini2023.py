@@ -888,11 +888,12 @@ def stopLoad():
     print("\nSimulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
 
     # save simulation
-    #os.mkdir('../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id'])
-    #shutil.copytree('data','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/data')
-    #shutil.copytree('plot','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/plot')
-    #shutil.copy('Rock_Triaxial_MassRemoval.py','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/Rock_Triaxial_MassRemoval.py')
-    #shutil.copy(O.tags['d.id']+'_report.txt','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/'+O.tags['d.id']+'_report.txt')
+    save_folder = '../../Work/DEM/Data_Tengattini2023/'+O.tags['d.id']
+    os.mkdir(save_folder)
+    shutil.copytree('data',save_folder+'/data')
+    shutil.copytree('plot',save_folder+'/plot')
+    shutil.copy('Tengattini2023.py',save_folder+'/Tengattini2023.py')
+    shutil.copy(O.tags['d.id']+'_report.txt',save_folder+'/'+O.tags['d.id']+'_report.txt')
 
 #-------------------------------------------------------------------------------
 
