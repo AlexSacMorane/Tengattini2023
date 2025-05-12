@@ -591,6 +591,9 @@ def checkUnbalanced_load_confinement_ic():
     plate_x.state.refPos = plate_x.state.pos
     plate_y.state.refPos = plate_y.state.pos
     plate_z.state.refPos = plate_z.state.pos
+
+    # save data
+    saveData()
     
     # compute vertical load 
     vert_pos_load = plate_z.state.refPos*(1-vert_strain_load) 
@@ -821,7 +824,7 @@ def checkUnbalanced():
         ax3.plot(L_count_bond)
         ax3.set_title('Number of bond (-)')
         # close
-        fig.savefig('plot/tracking_ite_'+str(i_load)+'.png')
+        #fig.savefig('plot/tracking_ite_'+str(i_load)+'.png')
         plt.close()
 
     # trackers
@@ -884,13 +887,12 @@ def stopLoad():
     simulation_report.close()
     print("\nSimulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
 
-    
     # save simulation
-    os.mkdir('../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id'])
-    shutil.copytree('data','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/data')
-    shutil.copytree('plot','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/plot')
-    shutil.copy('Rock_Triaxial_MassRemoval.py','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/Rock_Triaxial_MassRemoval.py')
-    shutil.copy(O.tags['d.id']+'_report.txt','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/'+O.tags['d.id']+'_report.txt')
+    #os.mkdir('../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id'])
+    #shutil.copytree('data','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/data')
+    #shutil.copytree('plot','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/plot')
+    #shutil.copy('Rock_Triaxial_MassRemoval.py','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/Rock_Triaxial_MassRemoval.py')
+    #shutil.copy(O.tags['d.id']+'_report.txt','../Data_Rock_Triaxial_MassRemoval/'+O.tags['d.id']+'/'+O.tags['d.id']+'_report.txt')
 
 #-------------------------------------------------------------------------------
 
