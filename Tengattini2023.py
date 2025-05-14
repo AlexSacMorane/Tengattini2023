@@ -50,7 +50,7 @@ YoungModulus_particle = 1e9 # Pa
 poisson_particle = 0.25 # -
 alphaKrReal = 0.5
 alphaKtwReal = 0.5
-frictionAngleReal = radians(30)
+frictionAngleReal = radians(20)
 
 # Mechanics Bonds
 YoungModulus_bond = YoungModulus_particle/5 # Pa 
