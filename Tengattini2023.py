@@ -888,7 +888,7 @@ def stopLoad():
     print("\nSimulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
 
     # save simulation
-    save_folder = '../../Work/DEM/Data_Tengattini2023/'+O.tags['d.id']
+    save_folder = '../../DEM/Data_Tengattini2023/'+O.tags['d.id']
     os.mkdir(save_folder)
     shutil.copytree('data',save_folder+'/data')
     shutil.copytree('plot',save_folder+'/plot')
