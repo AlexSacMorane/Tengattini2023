@@ -576,7 +576,7 @@ def checkUnbalanced_load_confinement_ic():
     simulation_report.write(str(n_grains)+' grains\n')
     simulation_report.write('Mean Overlap/Diameter ' + str(m_over_diam) + '\n')
     simulation_report.write('IC generation ends\n\n')
-    simulation_report.write('Porosity is '+ str(round(porosity(),3))+'(21 % in Tengattini, 2023)\n\n')
+    simulation_report.write('Porosity is '+ str(round(porosity(),3))+' (21 % in Tengattini, 2023)\n\n')
     simulation_report.close()
     print("\nPressure (Confinement) applied : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
     print('next step is the main loading (triaxial)\n')
