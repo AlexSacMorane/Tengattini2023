@@ -932,6 +932,7 @@ def saveData():
     L_coordination = []
     L_n_bond = []
     L_ratio_bond_broken = []
+    L_ratio_bond_broken_pp = []
     L_unbalanced_max = []
     L_sigma_x = []
     L_sigma_y = []
@@ -954,6 +955,7 @@ def saveData():
             L_sigma_deviatoric.append(1/2*(L_sigma_z[-1]-L_sigma_x[-1]) + 1/2*(L_sigma_z[-1]-L_sigma_y[-1]))
             L_coordination.append(data[i][7])
             L_n_bond.append(data[i][8])
+            L_ratio_bond_broken_pp.append((data[0][8]-data[i][8])/data[0][8])
             L_ratio_bond_broken.append(data[i][11])
             L_strain_x.append(abs(data[i][12]))
             L_strain_y.append(abs(data[i][13]))
@@ -968,12 +970,14 @@ def saveData():
         L_sigma_deviatoric_ref_1000 = [0, 243e3, 742e3, 1434e3, 2138e3, 2778e3, 3163e3, 3356e3, 3292e3, 3038e3, 2732e3, 2568e3, 2352e3, 2276e3]
         L_strain_z_ref_1500         = [0,   0.85,   1.56,   2.43,   3.25,   4.90,   6.64,   8.20,   8.85,   9.74]
         L_sigma_deviatoric_ref_1500 = [0, 2483e3, 3545e3, 4160e3, 4532e3, 4405e3, 4100e3, 3756e3, 3513e3, 3399e3]
+        L_strain_damage_ref_1500 = [0, 0.88, 2.00, 3.59, 5.03, 6.66, 8.23, 9.74]
+        L_damage_ref_1500        = [0, 0.07, 0.12, 0.19, 0.27, 0.34, 0.39, 0.44]
 
         # plot
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
 
         ax1.plot(L_strain_z, L_coordination)
-        ax1.set_title('Coordination (-)')
+        ax1.set_ylabel('Coordination (-)')
         ax1.set_xlabel(r'$\epsilon_z$ (%)')
 
         ax2.plot(L_strain_z, L_n_bond, 'b')
@@ -982,11 +986,14 @@ def saveData():
         ax2.set_title('Bonds (-)')
         ax2b = ax2.twinx()
         ax2b.plot(L_strain_z, L_ratio_bond_broken, 'r')
+        ax2b.plot(L_strain_z, L_ratio_bond_broken_pp, 'indianred')
         ax2b.set_ylabel('Ratio (%)', color='r')
-        # add Tengattini 2023 ? 
-        
+        # add Tengattini 2023 
+        ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
+ 
+                
         ax3.plot(L_strain_z, L_unbalanced_max)
-        ax3.set_xlabel('unbalanced max (-)')
+        ax3.set_ylabel('unbalanced max (-)')
         ax3.set_xlabel(r'$\epsilon_z$ (%)')
 
         ax4.plot(L_strain_z, L_sigma_deviatoric)
