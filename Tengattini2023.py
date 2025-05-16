@@ -43,7 +43,7 @@ kp = 2*1e-10 # m.N-1
 k_v_max = 0.000005 #-
 
 # cementation
-P_cementation = P_confinement*1 # Pa
+P_cementation = P_confinement*0.01 # Pa
 
 # Mechanics Particle (TBD)
 YoungModulus_particle = 1e9 # Pa
