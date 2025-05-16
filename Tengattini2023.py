@@ -389,6 +389,8 @@ def cementation():
     n_x = 200
     x_L = np.linspace(x_min, x_max, n_x)
     p_x_L = bsd_tenngatini2023(x_L)
+    # compute mean size of the cohesive surface
+    mean_cohesiveSurface = np.average(x_L, weights=p_x_L)
     # counter
     global counter_bond0
     counter_bond0 = 0
@@ -404,8 +406,8 @@ def cementation():
             # set normal and shear adhesions
             i.phys.normalAdhesion = tensileCohesion*cohesiveSurface
             i.phys.shearAdhesion = shearCohesion*cohesiveSurface
-            # average law
-            localYoungModulus = YoungModulus_particle+YoungModulus_bond
+            # local law
+            localYoungModulus = YoungModulus_particle + YoungModulus_bond*cohesiveSurface/mean_cohesiveSurface
             i.phys.kn = localYoungModulus*(O.bodies[i.id1].shape.radius*2*O.bodies[i.id2].shape.radius*2)/(O.bodies[i.id1].shape.radius*2+O.bodies[i.id2].shape.radius*2)
             i.phys.ks = poisson_particle*localYoungModulus*(O.bodies[i.id1].shape.radius*2*O.bodies[i.id2].shape.radius*2)/(O.bodies[i.id1].shape.radius*2+O.bodies[i.id2].shape.radius*2) 
             i.phys.kr = i.phys.ks*alphaKrReal*O.bodies[i.id1].shape.radius*O.bodies[i.id2].shape.radius
