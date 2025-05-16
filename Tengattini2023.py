@@ -296,7 +296,7 @@ def checkUnbalanced_load_cementation_ic():
     if len(L_rel_error_x) < window:
         return
     # check the force applied
-    if max(L_rel_error_x[-window:]) > 0.005 or max(L_rel_error_y[-window:]) > 0.005 or max(L_rel_error_z[-window:]) > 0.005 :
+    if max(L_rel_error_x[-window:]) > 0.01 or max(L_rel_error_y[-window:]) > 0.01 or max(L_rel_error_z[-window:]) > 0.01 :
         return
     if unbalancedForce() > unbalancedForce_criteria :
         return
@@ -350,7 +350,7 @@ def checkUnbalanced_param_ic():
     if len(L_rel_error_x) < window:
         return
     # check the force applied
-    if max(L_rel_error_x[-window:]) > 0.005 or max(L_rel_error_y[-window:]) > 0.005 or max(L_rel_error_z[-window:]) > 0.005 :
+    if max(L_rel_error_x[-window:]) > 0.01 or max(L_rel_error_y[-window:]) > 0.01 or max(L_rel_error_z[-window:]) > 0.01 :
         return
     if unbalancedForce() > unbalancedForce_criteria :
         return
@@ -544,7 +544,7 @@ def checkUnbalanced_load_confinement_ic():
     if len(L_rel_error_x) < window:
         return
     # check the force applied
-    if max(L_rel_error_x[-window:]) > 0.005 or max(L_rel_error_y[-window:]) > 0.005 or max(L_rel_error_z[-window:]) > 0.005 :
+    if max(L_rel_error_x[-window:]) > 0.01 or max(L_rel_error_y[-window:]) > 0.01 or max(L_rel_error_z[-window:]) > 0.01 :
         return
     # characterize the ic algorithm
     global tic, iter_0
@@ -837,7 +837,7 @@ def checkUnbalanced():
     if len(L_rel_error_x) < window:
         return
     # check the force applied
-    if max(L_rel_error_x[-window:]) > 0.005 or max(L_rel_error_y[-window:]) > 0.005 :
+    if max(L_rel_error_x[-window:]) > 0.01 or max(L_rel_error_y[-window:]) > 0.01 :
         return
     # verify unbalanced force criteria
     if unbalancedForce() < unbalancedForce_criteria:
@@ -956,7 +956,7 @@ def saveData():
             L_coordination.append(data[i][7])
             L_n_bond.append(data[i][8])
             L_ratio_bond_broken_pp.append((data[0][8]-data[i][8])/data[0][8])
-            L_ratio_bond_broken.append(data[i][11])
+            L_ratio_bond_broken.append(data[i][11]/100)
             L_strain_x.append(abs(data[i][12]))
             L_strain_y.append(abs(data[i][13]))
             L_strain_z.append(abs(data[i][14]))
@@ -987,7 +987,7 @@ def saveData():
         ax2b = ax2.twinx()
         ax2b.plot(L_strain_z, L_ratio_bond_broken, 'r')
         ax2b.plot(L_strain_z, L_ratio_bond_broken_pp, 'indianred')
-        ax2b.set_ylabel('Ratio (%)', color='r')
+        ax2b.set_ylabel('Ratio (-)', color='r')
         # add Tengattini 2023 
         ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
  
