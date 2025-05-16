@@ -592,6 +592,8 @@ def checkUnbalanced_load_confinement_ic():
     plate_y.state.refPos = plate_y.state.pos
     plate_z.state.refPos = plate_z.state.pos
 
+    # force value for data and plot
+    L_unbalanced_ite = [unbalancedForce_criteria]
     # save data
     saveData()
     
@@ -841,14 +843,14 @@ def checkUnbalanced():
         i_load = i_load + 1
         plate_z.state.pos = plate_z.state.refPos + (vert_pos_load-plate_z.state.refPos)*i_load/n_load
  
+        # save data
+        saveData()
+
         # reset trackers
         L_unbalanced_ite = []
         L_confinement_x_ite = []
         L_confinement_y_ite = []
         L_count_bond = []
-
-        # save data
-        saveData()
         
         # check simulation stop conditions
         if i_load > n_load:
@@ -906,7 +908,8 @@ def addPlotData():
     sy = O.forces.f(plate_y.id)[1]/(plate_x.state.pos[0]*plate_z.state.pos[2])
     sz = O.forces.f(plate_z.id)[2]/(plate_x.state.pos[0]*plate_y.state.pos[1])
     # add data
-    plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(), counter_bond=count_bond(), \
+    plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(), unbalanced_max=max(L_unbalanced_ite),\
+                counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0,\
                 Sx=sx, Sy=sy, Sz=sz, \
                 X_plate=plate_x.state.pos[0], Y_plate=plate_y.state.pos[1], Z_plate=plate_z.state.pos[2],\
                 conf_verified= 1/2*sx/(P_confinement)*100 + 1/2*sy/(P_confinement)*100, \
@@ -922,9 +925,12 @@ def saveData():
     """
     addPlotData()
     plot.saveDataTxt('data/'+O.tags['d.id']+'.txt')
+
     # post-proccess
     L_coordination = []
     L_n_bond = []
+    L_ratio_bond_broken = []
+    L_unbalanced_max = []
     L_sigma_x = []
     L_sigma_y = []
     L_sigma_z = []
@@ -946,10 +952,12 @@ def saveData():
             L_sigma_deviatoric.append(1/2*(L_sigma_z[-1]-L_sigma_x[-1]) + 1/2*(L_sigma_z[-1]-L_sigma_y[-1]))
             L_coordination.append(data[i][7])
             L_n_bond.append(data[i][8])
-            L_strain_x.append(abs(data[i][11]))
-            L_strain_y.append(abs(data[i][12]))
-            L_strain_z.append(abs(data[i][13]))
+            L_ratio_bond_broken.append(data[i][11])
+            L_strain_x.append(abs(data[i][12]))
+            L_strain_y.append(abs(data[i][13]))
+            L_strain_z.append(abs(data[i][14]))
             L_shear_strain.append(abs(1/2*2/3*(L_strain_z[-1]-L_strain_x[-1]) + 1/2*2/3*(L_strain_z[-1]-L_strain_y[-1])))
+            L_unbalanced_max.append(data[i][16])
 
         # Add Tengattini 2023 for 500, 1000, 1500 kPa of confinement
         L_strain_z_ref_500         = [0,  0.13,  1.03,   2.10,   2.85,   3.66,   4.82,   6.42,   8.11,   9.76,   11.0]
@@ -960,38 +968,46 @@ def saveData():
         L_sigma_deviatoric_ref_1500 = [0, 2483e3, 3545e3, 4160e3, 4532e3, 4405e3, 4100e3, 3756e3, 3513e3, 3399e3]
 
         # plot
-        fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(16,9),num=1)
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
 
         ax1.plot(L_coordination)
         ax1.set_title('Coordination (-)')
 
-        ax2.plot(L_n_bond)
-        ax2.set_title('Number of bond (-)')
+        ax2.plot(L_unbalanced_max)
+        ax2.set_xlabel('unbalanced max (-)')
 
-        # add Tengattini 2023
-        ax3.plot(L_strain_z, L_sigma_deviatoric)
-        if P_confinement == 0.5e6:
-            ax3.plot(L_strain_z_ref_500, L_sigma_deviatoric_ref_500, linestyle='dashed', color='k')
-        if P_confinement == 1.0e6:
-            ax3.plot(L_strain_z_ref_1000, L_sigma_deviatoric_ref_1000, linestyle='dashed', color='k')
-        if P_confinement == 1.5e6:
-            ax3.plot(L_strain_z_ref_1500, L_sigma_deviatoric_ref_1500, linestyle='dashed', color='k')
-        ax3.set_xlabel(r'$\epsilon_z$ (%)')
-        ax3.set_ylabel(r'Deviatoric stress (Pa)')
+        ax3.plot(L_n_bond, 'b')
+        ax3.set_ylabel('Number (-)', color='b')
+        ax3.set_title('Bonds (-)')
+        ax3b = ax3.twinx()
+        ax3b.plot(L_ratio_bond_broken, 'r')
+        ax3b.set_ylabel('ratio (-)', color='r')
+        # add Tengattini 2023 ? 
         
-        ax4.plot(L_shear_strain, L_sigma_deviatoric)
-        ax4.set_xlabel(r'$\epsilon_q$ (%)')
+        ax4.plot(L_strain_z, L_sigma_deviatoric)
+        # add Tengattini 2023
+        if P_confinement == 0.5e6:
+            ax4.plot(L_strain_z_ref_500, L_sigma_deviatoric_ref_500, linestyle='dashed', color='k')
+        if P_confinement == 1.0e6:
+            ax4.plot(L_strain_z_ref_1000, L_sigma_deviatoric_ref_1000, linestyle='dashed', color='k')
+        if P_confinement == 1.5e6:
+            ax4.plot(L_strain_z_ref_1500, L_sigma_deviatoric_ref_1500, linestyle='dashed', color='k')
+        ax4.set_xlabel(r'$\epsilon_z$ (%)')
         ax4.set_ylabel(r'Deviatoric stress (Pa)')
+        
+        #ax4.plot(L_shear_strain, L_sigma_deviatoric)
+        #ax4.set_xlabel(r'$\epsilon_q$ (%)')
+        #ax4.set_ylabel(r'Deviatoric stress (Pa)')
 
-        ax5.plot(L_strain_z, L_sigma_z)
-        ax5.set_xlabel(r'$\epsilon_z$ (%)')
-        ax5.set_ylabel(r'Vertical stress (Pa)')
+        #ax5.plot(L_strain_z, L_sigma_z)
+        #ax5.set_xlabel(r'$\epsilon_z$ (%)')
+        #ax5.set_ylabel(r'Vertical stress (Pa)')
 
-        ax6.plot(L_strain_z, L_strain_x, label=r'$\epsilon_x$')
-        ax6.plot(L_strain_z, L_strain_y, label=r'$\epsilon_y$')
-        ax6.legend(fontsize=15)
-        ax6.set_xlabel(r'$\epsilon_z$ (%)')
-        ax6.set_ylabel(r'Lateral strain (%)')
+        #ax6.plot(L_strain_z, L_strain_x, label=r'$\epsilon_x$')
+        #ax6.plot(L_strain_z, L_strain_y, label=r'$\epsilon_y$')
+        #ax6.legend(fontsize=15)
+        #ax6.set_xlabel(r'$\epsilon_z$ (%)')
+        #ax6.set_ylabel(r'Lateral strain (%)')
 
         plt.suptitle(r'Trackers - loading step (-)')
         plt.savefig('plot/'+O.tags['d.id']+'.png')
