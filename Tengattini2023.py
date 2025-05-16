@@ -911,7 +911,7 @@ def addPlotData():
     sz = O.forces.f(plate_z.id)[2]/(plate_x.state.pos[0]*plate_y.state.pos[1])
     # add data
     plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(), unbalanced_max=max(L_unbalanced_ite),\
-                counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0,\
+                counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0*100,\
                 Sx=sx, Sy=sy, Sz=sz, \
                 X_plate=plate_x.state.pos[0], Y_plate=plate_y.state.pos[1], Z_plate=plate_z.state.pos[2],\
                 conf_verified= 1/2*sx/(P_confinement)*100 + 1/2*sy/(P_confinement)*100, \
@@ -972,20 +972,23 @@ def saveData():
         # plot
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
 
-        ax1.plot(L_coordination)
+        ax1.plot(L_strain_z, L_coordination)
         ax1.set_title('Coordination (-)')
+        ax1.set_xlabel(r'$\epsilon_z$ (%)')
 
-        ax2.plot(L_unbalanced_max)
-        ax2.set_xlabel('unbalanced max (-)')
-
-        ax3.plot(L_n_bond, 'b')
-        ax3.set_ylabel('Number (-)', color='b')
-        ax3.set_title('Bonds (-)')
-        ax3b = ax3.twinx()
-        ax3b.plot(L_ratio_bond_broken, 'r')
-        ax3b.set_ylabel('ratio (-)', color='r')
+        ax2.plot(L_strain_z, L_n_bond, 'b')
+        ax2.set_ylabel('Number (-)', color='b')
+        ax2.set_xlabel(r'$\epsilon_z$ (%)')
+        ax2.set_title('Bonds (-)')
+        ax2b = ax2.twinx()
+        ax2b.plot(L_strain_z, L_ratio_bond_broken, 'r')
+        ax2b.set_ylabel('Ratio (%)', color='r')
         # add Tengattini 2023 ? 
         
+        ax3.plot(L_strain_z, L_unbalanced_max)
+        ax3.set_xlabel('unbalanced max (-)')
+        ax3.set_xlabel(r'$\epsilon_z$ (%)')
+
         ax4.plot(L_strain_z, L_sigma_deviatoric)
         # add Tengattini 2023
         if P_confinement == 0.5e6:
