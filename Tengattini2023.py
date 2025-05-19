@@ -841,13 +841,13 @@ def checkUnbalanced():
         return
     # verify unbalanced force criteria
     if unbalancedForce() < unbalancedForce_criteria:
+        # save data
+        saveData()
+
         # apply vertical load
         i_load = i_load + 1
         plate_z.state.pos = plate_z.state.refPos + (vert_pos_load-plate_z.state.refPos)*i_load/n_load
  
-        # save data
-        saveData()
-
         # reset trackers
         L_unbalanced_ite = []
         L_confinement_x_ite = []
