@@ -43,7 +43,7 @@ kp = 2*1e-10 # m.N-1
 k_v_max = 0.000005 #-
 
 # cementation
-P_cementation = P_confinement*0.01 # Pa
+P_cementation = 1e4 # Pa
 
 # Mechanics Particle (TBD)
 YoungModulus_particle = 1e9 # Pa
@@ -55,8 +55,8 @@ frictionAngleReal = radians(20)
 # Mechanics Bonds
 YoungModulus_bond = YoungModulus_particle/5 # Pa 
 # rupture (TBD)
-tensileCohesion = 5e6 # Pa
-shearCohesion = tensileCohesion*2.4 # Pa
+tensileCohesion = 0.8*1e8 # Pa
+shearCohesion = tensileCohesion # Pa
 
 # time step
 factor_dt_crit_1 = 0.6
