@@ -985,7 +985,8 @@ def saveData():
         ax2b.plot(L_strain_z, L_ratio_bond_broken_pp, 'indianred')
         ax2b.set_ylabel('Ratio (-)', color='r')
         # add Tengattini 2023 
-        ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
+        if P_confinement == 1.5e6:
+            ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
  
                 
         ax3.plot(L_strain_z, L_unbalanced_max)
