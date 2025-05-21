@@ -384,11 +384,11 @@ def cementation():
     Generate cementation between grains.
     '''
     # generate the list of cohesive surface area and its list of weight
-    x_min = 0.13e4 # µm2
+    x_min = 0.e4 # µm2
     x_max = 3.20e4 # µm2
     n_x = 200
     x_L = np.linspace(x_min, x_max, n_x)
-    p_x_L = bsd_tenngatini2023(x_L)
+    cum_p_x_L, p_x_L = bsd_tenngatini2023(x_L)
     # compute mean size of the cohesive surface
     mean_cohesiveSurface = np.average(x_L, weights=p_x_L)
     # counter
@@ -402,7 +402,7 @@ def cementation():
             # creation of cohesion
             i.phys.cohesionBroken = False
             # determine the cohesive surface
-            cohesiveSurface = random.choices(x_L,p_x_L)[0]*1e-12 # m2
+            cohesiveSurface = random.choices(x_L, cum_weights=cum_p_x_L)[0]*1e-12 # m2
             # set normal and shear adhesions
             i.phys.normalAdhesion = tensileCohesion*cohesiveSurface
             i.phys.shearAdhesion = shearCohesion*cohesiveSurface
@@ -435,51 +435,47 @@ def bsd_tenngatini2023(L_size):
     Define the weight of a bond size from (Tengattini, 2023).
     '''
     # reference (8% cement)
-    L_ref_size = [0.13e4, 0.28e4, 0.51e4, 0.72e4, 0.91e4, 1.14e4, 1.37e4, 1.65e4, 2.01e4, 2.36e4, 2.77e4, 3.20e4]
-    L_ref_prob = [  0.02,   0.04,   0.12,   0.16,   0.13,   0.14,   0.12,   0.11,   0.07,   0.04,   0.02,   0.03]
-    L_ref_cum_prob = [L_ref_prob[0]]
-    for ref_prob in L_ref_prob[1:]:
-        L_ref_cum_prob.append(L_ref_cum_prob[-1] + ref_prob)
+    L_ref_size     = [0, 0.08e4, 0.21e4, 0.36e4, 0.51e4, 0.73e4, 0.89e4, 1.05e4, 1.27e4, 1.56e4, 1.94e4, 2.55e4, 3.2e4]
+    L_ref_cum_prob = [0,   0.01,   0.04,   0.10,   0.19,   0.33,   0.45,   0.56,   0.68,   0.81,   0.91,   0.97,     1]
+    
+    # input 
+    size_min = 0.08e4 # µm2
+    size_max = 3.20e4 # µm2
+    n_size = 200
+    L_size = np.linspace(size_min, size_max, n_size)
 
-    # compute weight
-    L_p_size = []
+    # compute cumulative weight
+    L_cum_p_size = []
     for size in L_size:
-        # out of range
-        if size < L_ref_size[0] or L_ref_size[-1] < size :
-            L_p_size.append(0)
-        # in range
-        else :
-            # find interval
-            i_ref_size = 0
-            while not (L_ref_size[i_ref_size] <= size and size <= L_ref_size[i_ref_size+1]):
-                i_ref_size = i_ref_size + 1
-            # compute weight
-            p_size = L_ref_prob[i_ref_size] + (L_ref_prob[i_ref_size+1]-L_ref_prob[i_ref_size])/(L_ref_size[i_ref_size+1]-L_ref_size[i_ref_size])*(size-L_ref_size[i_ref_size])
-            L_p_size.append(p_size)
-    # normalize
-    sum_p_size = np.sum(L_p_size)
-    for i_p_size in range(len(L_p_size)):
-        L_p_size[i_p_size] = L_p_size[i_p_size]/sum_p_size
-    # compute cumulative
-    L_cum_p_size = [L_p_size[0]]
-    for p_size in L_p_size[1:]:
-        L_cum_p_size.append(L_cum_p_size[-1]+p_size)
+        # find interval
+        i_ref_size = 0
+        while not (L_ref_size[i_ref_size] <= size and size <= L_ref_size[i_ref_size+1]):
+            i_ref_size = i_ref_size + 1
+        # compute cumulative prob
+        cum_p_size = L_ref_cum_prob[i_ref_size] + (L_ref_cum_prob[i_ref_size+1]-L_ref_cum_prob[i_ref_size])/(L_ref_size[i_ref_size+1]-L_ref_size[i_ref_size])*(size-L_ref_size[i_ref_size])
+        L_cum_p_size.append(cum_p_size)
+
+    # compute the weight
+    L_p_size = []
+    for i_size in range(len(L_size)):
+        if i_size == 0:
+            p_size = (L_cum_p_size[i_size+1]-L_cum_p_size[i_size])/(L_size[i_size+1]-L_size[i_size])
+        if 0 < i_size and i_size < len(L_size)-1:
+            p_size = (L_cum_p_size[i_size+1]-L_cum_p_size[i_size-1])/(L_size[i_size+1]-L_size[i_size-1])
+        if i_size == len(L_size)-1:
+            p_size = (L_cum_p_size[i_size]-L_cum_p_size[i_size-1])/(L_size[i_size]-L_size[i_size-1])
+        L_p_size.append(p_size)
     
     # plot 
-    fig, (ax1, ax2) = plt.subplots(2,1, figsize=(16,9),num=1)
-    # percentage
-    ax1.plot(L_size, L_p_size)
-    ax1.set_ylabel('percentage (-)')
-    # cumulative
-    ax2.plot(L_size, L_cum_p_size)
-    ax2.plot(L_ref_size, L_ref_cum_prob, linestyle='dashed', color='k')
-    ax2.set_ylabel('cumulative percentage (-)')
-    ax2.set_ylabel(r'bond size ($\mu m^2$)')
-    # close
+    fig, (ax1) = plt.subplots(1,1, figsize=(16,9),num=1)
+    ax1.plot(L_size, L_cum_p_size)
+    ax1.scatter(L_ref_size, L_ref_cum_prob, color='k')
+    ax1.set_ylabel('cumulative percentage (-)')
+    ax1.set_ylabel(r'bond size ($\mu m^2$)')
     fig.savefig('plot/BSD.png')
     plt.close()
 
-    return L_p_size
+    return L_cum_p_size, L_p_size
 
 #-------------------------------------------------------------------------------
 
