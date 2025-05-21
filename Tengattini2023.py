@@ -36,8 +36,8 @@ n_steps_ic = 100
 # Walls
 P_confinement = 1.5e6 # Pa
 # triaxial 
-vert_strain_load = 0.05 # -
-n_load = 15
+vert_strain_load = 0.1 # -
+n_load = 30
 # controler
 kp = 2*1e-10 # m.N-1
 k_v_max = 0.000005 #-
@@ -46,16 +46,16 @@ k_v_max = 0.000005 #-
 P_cementation = 1e4 # Pa
 
 # Mechanics Particle (TBD)
-YoungModulus_particle = 1e9 # Pa
+YoungModulus_particle = 1.0e9 # Pa
 poisson_particle = 0.25 # -
 alphaKrReal = 0.00
 alphaKtwReal = alphaKrReal
-frictionAngleReal = radians(20)
+frictionAngleReal = radians(22)
 
 # Mechanics Bonds
 YoungModulus_bond = YoungModulus_particle/5 # Pa 
 # rupture (TBD)
-tensileCohesion = 3*1e7 # Pa
+tensileCohesion = 4*1e7 # Pa
 shearCohesion = tensileCohesion # Pa
 
 # time step
