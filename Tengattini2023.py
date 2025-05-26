@@ -37,7 +37,7 @@ n_steps_ic = 100
 P_confinement = 1.5e6 # Pa
 # triaxial 
 vert_strain_load = 0.1 # -
-n_load = 30
+n_load = 100
 # controler
 kp = 2*1e-10 # m.N-1
 k_v_max = 0.000005 #-
