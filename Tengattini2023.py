@@ -530,7 +530,7 @@ def checkUnbalanced_load_confinement_ic():
     '''
     Wait to reach the vertical/lateral pressure targetted for confinement.
     '''
-    global i_load, L_unbalanced_ite, L_confinement_x_ite, L_confinement_y_ite, L_count_bond, vert_pos_load, L_rel_error_x, L_rel_error_y, L_rel_error_z 
+    global i_load, L_unbalanced_ite, L_confinement_x_ite, L_confinement_y_ite, L_count_bond, vert_pos_load, L_rel_error_x, L_rel_error_y, L_rel_error_z, vtkExporter_interactions
     addPlotData_confinement_ic()
     saveData_ic()
     # trackers
@@ -594,6 +594,10 @@ def checkUnbalanced_load_confinement_ic():
     L_unbalanced_ite = [unbalancedForce_criteria]
     # save data
     saveData()
+
+    # init vtk and export
+    vtkExporter_interactions = export.VTKExporter('vtk/interactions')
+    vtkExporter_interactions.exportInteractions(what=dict(broken='i.phys.cohesionBroken', id1='i.id1', id2='i.id2'))
     
     # compute vertical load 
     vert_pos_load = plate_z.state.refPos*(1-vert_strain_load) 
@@ -616,7 +620,7 @@ def checkUnbalanced_load_confinement_ic():
 
     # user print
     print('Loading step :', i_load, '/', n_load, '-> ev =', vert_strain_load*i_load/n_load)
-
+    
 #-------------------------------------------------------------------------------
 
 def addPlotData_cementation_ic():
@@ -840,6 +844,10 @@ def checkUnbalanced():
         # save data
         saveData()
 
+        # export data
+        if i_load in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]: # change values for different observations
+            vtkExporter_interactions.exportInteractions(what=dict(broken='i.phys.cohesionBroken', id1='i.id1', id2='i.id2'))
+
         # apply vertical load
         i_load = i_load + 1
         plate_z.state.pos = plate_z.state.refPos + (vert_pos_load-plate_z.state.refPos)*i_load/n_load
@@ -892,6 +900,7 @@ def stopLoad():
     os.mkdir(save_folder)
     shutil.copytree('data',save_folder+'/data')
     shutil.copytree('plot',save_folder+'/plot')
+    shutil.copytree('vtk',save_folder+'/vtk')
     shutil.copy('Tengattini2023.py',save_folder+'/Tengattini2023.py')
     shutil.copy(O.tags['d.id']+'_report.txt',save_folder+'/'+O.tags['d.id']+'_report.txt')
 
