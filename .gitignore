@@ -2,6 +2,9 @@
 *_report.txt
 pp_articles.py
 
+# Folders with the scans
+Tengattini2023_scans
+
 # Folders created during the simulation
 data
 plot
