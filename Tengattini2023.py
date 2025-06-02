@@ -46,16 +46,16 @@ k_v_max = 0.000005 #-
 P_cementation = 1e4 # Pa
 
 # Mechanics Particle (TBD)
-YoungModulus_particle = 1.0e9 # Pa
+YoungModulus_particle = 0.9e9 # Pa
 poisson_particle = 0.25 # -
 alphaKrReal = 0.00
 alphaKtwReal = alphaKrReal
-frictionAngleReal = radians(22)
+frictionAngleReal = radians(15)
 
 # Mechanics Bonds
 YoungModulus_bond = YoungModulus_particle/5 # Pa 
 # rupture (TBD)
-tensileCohesion = 4*1e7 # Pa
+tensileCohesion = 3.5*1e7 # Pa
 shearCohesion = tensileCohesion # Pa
 
 # time step
@@ -64,7 +64,7 @@ factor_dt_crit_2 = 0.2
 
 # steady-state detection
 window = 10
-unbalancedForce_criteria = 0.1
+unbalancedForce_criteria = 0.01
 
 # Report
 simulation_report_name = O.tags['d.id']+'_report.txt'
