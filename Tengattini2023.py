@@ -600,7 +600,7 @@ def checkUnbalanced_load_confinement_ic():
 
     # init vtk and export
     vtkExporter_interactions = export.VTKExporter('vtk/interactions')
-    vtkExporter_interactions.exportInteractions(what=dict(broken='i.phys.cohesionBroken', id1='i.id1', id2='i.id2'))
+    #vtkExporter_interactions.exportInteractions(what=dict(broken='i.phys.cohesionBroken', id1='i.id1', id2='i.id2'))
     
     # compute vertical load 
     vert_pos_load = plate_z.state.refPos*(1-vert_strain_load) 
@@ -848,8 +848,8 @@ def checkUnbalanced():
         saveData()
 
         # export data
-        if i_load in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]: # change values for different observations
-            vtkExporter_interactions.exportInteractions(what=dict(broken='i.phys.cohesionBroken', id1='i.id1', id2='i.id2'))
+        #if i_load in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]: # change values for different observations
+            #vtkExporter_interactions.exportInteractions(what=dict(broken='i.phys.cohesionBroken', id1='i.id1', id2='i.id2'))
 
         # apply vertical load
         i_load = i_load + 1
