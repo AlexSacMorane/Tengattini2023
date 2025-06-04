@@ -5,12 +5,7 @@
 from yade import pack, plot, export
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-import shutil
-import time
-import math
-import random
-import pickle
+import os, shutil, time, math, random
 from pathlib import Path
 
 #-------------------------------------------------------------------------------
@@ -91,18 +86,10 @@ tic_0 = tic
 iter_0 = 0
 
 # plan simulation
-if Path('plot').exists():
-    shutil.rmtree('plot')
-os.mkdir('plot')
-if Path('data').exists():
-    shutil.rmtree('data')
-os.mkdir('data')
-if Path('vtk').exists():
-    shutil.rmtree('vtk')
-os.mkdir('vtk')
-if Path('save').exists():
-    shutil.rmtree('save')
-os.mkdir('save')
+create_folder('plot')
+create_folder('data')
+create_folder('vtk')
+create_folder('save')
 
 # define wall material (no friction)
 O.materials.append(CohFrictMat(young=YoungModulus_particle, poisson=poisson_particle, frictionAngle=0, density=density_grain, isCohesive=False, momentRotationLaw=False))
