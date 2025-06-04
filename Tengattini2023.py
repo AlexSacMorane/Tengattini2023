@@ -5,7 +5,7 @@
 from yade import pack, plot, export
 import numpy as np
 import matplotlib.pyplot as plt
-import os, shutil, time, math, random
+import os, shutil, time, math, random, glob
 from pathlib import Path
 
 #-------------------------------------------------------------------------------
@@ -92,7 +92,9 @@ os.mkdir('vtk')
 if Path('save').exists():
     shutil.rmtree('save')
 os.mkdir('save')
-os.system('rm *_report.txt')
+files = glob.glob('*_report.txt')
+for file in files:
+    os.remove(file)
 
 # define wall material (no friction)
 O.materials.append(CohFrictMat(young=YoungModulus_particle, poisson=poisson_particle, frictionAngle=0, density=density_grain, isCohesive=False, momentRotationLaw=False))
