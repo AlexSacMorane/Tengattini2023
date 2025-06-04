@@ -92,6 +92,7 @@ os.mkdir('vtk')
 if Path('save').exists():
     shutil.rmtree('save')
 os.mkdir('save')
+os.system('rm *_report.txt')
 
 # define wall material (no friction)
 O.materials.append(CohFrictMat(young=YoungModulus_particle, poisson=poisson_particle, frictionAngle=0, density=density_grain, isCohesive=False, momentRotationLaw=False))
