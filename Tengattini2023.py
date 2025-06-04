@@ -5,12 +5,7 @@
 from yade import pack, plot, export
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-import shutil
-import time
-import math
-import random
-import pickle
+import os, shutil, time, math, random
 from pathlib import Path
 
 #-------------------------------------------------------------------------------
@@ -983,10 +978,10 @@ def saveData():
         #L_damage_ref_1500        = [0, 0.07, 0.12, 0.19, 0.27, 0.34, 0.39, 0.44]
         
         # (6% cement)
-        L_strain_z_ref_1500         = [0, 0.13, 0.43, 0.78, 1.20, 1.89, 3.04, 4.05, 5.03, 6.34, 7.57, 8.85, 10.01]
-        L_sigma_deviatoric_ref_1500 = [0, 0.47, 1.57, 2.20, 2.73, 3.29, 3.78, 4.16, 4.14, 3.91, 3.78, 3.50,  3.48]
-        L_strain_z_ref_1000         = [0, 0.21, 0.52, 0.81, 1.32, 1.84, 2.46, 2.96, 3.60, 4.20, 5.29, 5.98, 6.78, 7.48, 8.47, 9.52, 9.99]
-        L_sigma_deviatoric_ref_1000 = [0, 0.58, 1.05, 1.38, 1.73, 2.13, 2.34, 2.52, 2.59, 2.66, 2.61, 2.59, 2.53, 2.48, 2.38, 2.30, 2.24]
+        L_strain_z_ref_1000         = [0,  0.21,   0.52,   0.81,   1.32,   1.84,   2.46,   2.96,   3.60,   4.20,   5.29,   5.98,   6.78,   7.48,   8.47,   9.52,   9.99]
+        L_sigma_deviatoric_ref_1000 = [0, 580e3, 1050e3, 1380e3, 1730e3, 2130e3, 2340e3, 2520e3, 2590e3, 2660e3, 2610e3, 2590e3, 2530e3, 2480e3, 2380e3, 2300e3, 2240e3]
+        L_strain_z_ref_1500         = [0,  0.13,   0.43,   0.78,   1.20,   1.89,   3.04,   4.05,   5.03,   6.34,   7.57,   8.85,   10.01]
+        L_sigma_deviatoric_ref_1500 = [0, 470e3, 1570e3, 2200e3, 2730e3, 3290e3, 3780e3, 4160e3, 4140e3, 3910e3, 3780e3, 3500e3,  3480e3]
         
         # plot
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
