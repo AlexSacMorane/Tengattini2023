@@ -380,11 +380,7 @@ def cementation():
     Generate cementation between grains.
     '''
     # generate the list of cohesive surface area and its list of weight
-    x_min = 0.e4 # µm2
-    x_max = 3.20e4 # µm2
-    n_x = 200
-    x_L = np.linspace(x_min, x_max, n_x)
-    cum_p_x_L, p_x_L = bsd_tenngatini2023(x_L)
+    cum_p_x_L, p_x_L, x_L = bsd_tenngatini2023()
     # compute mean size of the cohesive surface
     mean_cohesiveSurface = np.average(x_L, weights=p_x_L)
     # counter
@@ -426,7 +422,7 @@ def cementation():
 
 #-------------------------------------------------------------------------------
 
-def bsd_tenngatini2023(L_size):
+def bsd_tenngatini2023():
     '''
     Define the weight of a bond size from (Tengattini, 2023).
     '''
@@ -474,7 +470,7 @@ def bsd_tenngatini2023(L_size):
     fig.savefig('plot/BSD.png')
     plt.close()
 
-    return L_cum_p_size, L_p_size
+    return L_cum_p_size, L_p_size, L_size
 
 #-------------------------------------------------------------------------------
 
