@@ -200,12 +200,63 @@ if not Path('seg/tempo_save.dict').exists():
             pickle.dump(dict_save, handle, protocol=pickle.HIGHEST_PROTOCOL) 
 
 else :
-
     # load save
     with open('seg/tempo_save.dict', 'rb') as handle:
             dict_save = pickle.load(handle)
     L_M_bin_grain_i_max = dict_save['L_M_bin_grain_i_max']
     L_parameter_test_max = dict_save['L_parameter_test_max']
+
+# extract the radius
+L_radius = []
+# convert in µm
+pixel_to_um = 14.8 # µm/pixel
+for parameter in L_parameter_test_max:
+    L_radius.append(parameter[0]*pixel_to_um)
+
+# plot the PSD
+n_pp = 20
+L_radius_pp = np.linspace(min(L_radius), max(L_radius), n_pp)
+L_n_radius_pp = np.zeros((n_pp-1,))
+for radius in L_radius_pp:
+    i_pp = 0
+    while not(L_radius_pp[i_pp]<=radius and radius<=L_radius_pp[i_pp+1]):
+        i_pp = i_pp + 1
+    L_n_radius_pp[i_pp] = L_n_radius_pp[i_pp] + 1
+# compute cumulative
+L_cum_n_radius_pp = np.zeros((n_pp-1,))
+for i in range(len(L_n_radius_pp)):
+    L_cum_n_radius_pp[i] = L_n_radius_pp[i]/np.sum(L_n_radius_pp)
+    if i > 0:
+        L_cum_n_radius_pp[i] = L_cum_n_radius_pp[i] + L_cum_n_radius_pp[i-1]
+
+fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,9), num=1)
+ax1.scatter(L_radius_pp[:-1], L_n_radius_pp)
+ax2.scatter(L_radius_pp[:-1], L_cum_n_radius_pp)
+plt.savefig('seg/radius_resume.png')
+plt.close()
+
+# rebuild the prediction of the microstructure (grain)
+M_bin_grain_predicted = np.zeros_like(M_bin_grain)
+for M_bin_grain_i_max in L_M_bin_grain_i_max:
+    M_bin_grain_predicted = M_bin_grain_predicted + M_bin_grain_i_max
+# characterize the segmentation of the grain
+S_12 = 0
+S_11 = 0
+S_22 = 0
+M_prediction_grain = np.ones_like(M_bin_grain)
+for i_x in range(M_bin_grain.shape[0]):
+    for i_y in range(M_bin_grain.shape[1]):
+        for i_z in range(M_bin_grain.shape[2]):
+            # NCC
+            S_12 = S_12 + M_bin_grain[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+            S_11 = S_11 + M_bin_grain[i_x,i_y,i_z] * M_bin_grain[i_x,i_y,i_z]
+            S_22 = S_22 + M_bin_grain_predicted[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+            # other comparison
+            if M_bin_grain[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
+                M_prediction_grain[i_x, i_y, i_z] = True
+            else : 
+                M_prediction_grain[i_x, i_y, i_z] = False
+print('Grain :', np.sum(M_prediction_grain)/M_prediction_grain.size, S_12/(S_11*S_22)**(1/2))
 
 # determine contact with cement
 print('Segmentate the cement')
@@ -275,6 +326,41 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                 plt.savefig('seg/c_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
                 plt.close()
 
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+ax1.imshow(M_bin_cement[:, :, int(M_bin_cement.shape[2]/2)])
+ax2.imshow(M_bin_cement[:, int(M_bin_cement.shape[2]/2), :])
+ax3.imshow(M_bin_cement[int(M_bin_cement.shape[2]/2), :, :])
+plt.savefig('seg/cement_resume.png')
+plt.close()
+
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+ax1.imshow(M_n_active_cement[:, :, int(M_n_active_cement.shape[2]/2)])
+ax2.imshow(M_n_active_cement[:, int(M_n_active_cement.shape[2]/2), :])
+ax3.imshow(M_n_active_cement[int(M_n_active_cement.shape[2]/2), :, :])
+plt.savefig('seg/cement_n_active_resume.png')
+plt.close()
+
+# characterize the segmentation of the cement
+S_12 = 0
+S_11 = 0
+S_22 = 0
+M_prediction_cement = np.ones_like(M_bin_cement)
+for i_x in range(M_bin_grain.shape[0]):
+    for i_y in range(M_bin_grain.shape[1]):
+        for i_z in range(M_bin_grain.shape[2]):
+            if M_n_active_cement[i_x, i_y, i_z] > 0:
+                # NCC
+                S_12 = S_12 + M_bin_cement[i_x,i_y,i_z] * 1
+                S_22 = S_22 + 1 * 1
+            S_11 = S_11 + M_bin_cement[i_x,i_y,i_z] * M_bin_cement[i_x,i_y,i_z]
+            # other comparison
+            if M_bin_cement[i_x, i_y, i_z] == True and M_n_active_cement[i_x, i_y, i_z] > 0:
+                M_prediction_cement[i_x, i_y, i_z] = True
+            elif M_bin_cement[i_x, i_y, i_z] == False and M_n_active_cement[i_x, i_y, i_z] == 0:
+                M_prediction_cement[i_x, i_y, i_z] = True
+            else : 
+                M_prediction_cement[i_x, i_y, i_z] = False
+print('Cement :',np.sum(M_prediction_cement)/M_prediction_cement.size, S_12/(S_11*S_22)**(1/2))
 
 # iterate on  the cement bridge
 L_S_cement = []
@@ -310,22 +396,50 @@ for i in range(len(L_n_S_cement_pp)):
     if i > 0:
         L_cum_n_S_cement_pp[i] = L_cum_n_S_cement_pp[i] + L_cum_n_S_cement_pp[i-1]
 
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
-ax1.imshow(M_bin_cement[:, :, int(M_bin_cement.shape[2]/2)])
-ax2.imshow(M_bin_cement[:, int(M_bin_cement.shape[2]/2), :])
-ax3.imshow(M_bin_cement[int(M_bin_cement.shape[2]/2), :, :])
-plt.savefig('seg/cement_resume.png')
-plt.close()
-
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
-ax1.imshow(M_n_active_cement[:, :, int(M_n_active_cement.shape[2]/2)])
-ax2.imshow(M_n_active_cement[:, int(M_n_active_cement.shape[2]/2), :])
-ax3.imshow(M_n_active_cement[int(M_n_active_cement.shape[2]/2), :, :])
-plt.savefig('seg/cement_n_active_resume.png')
-plt.close()
-
 fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,9), num=1)
 ax1.scatter(L_S_cement_pp[:-1], L_n_S_cement_pp)
 ax2.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp)
 plt.savefig('seg/S_cement_resume.png')
+plt.close()
+
+# convert in µm
+pixel_to_um = 14.8 # µm/pixel
+for i_S_cement_pp in range(len(L_S_cement_pp)):
+    L_S_cement_pp[i_S_cement_pp] = L_S_cement_pp[i_S_cement_pp]*pixel_to_um*pixel_to_um
+
+# reference value
+L_ref_size     = [0, 0.08e4, 0.21e4, 0.36e4, 0.51e4, 0.73e4, 0.89e4, 1.05e4, 1.27e4, 1.56e4, 1.94e4, 2.55e4, 3.2e4]
+L_ref_cum_prob = [0,   0.01,   0.04,   0.10,   0.19,   0.33,   0.45,   0.56,   0.68,   0.81,   0.91,   0.97,     1]
+size_min = 0.08e4 # µm2
+size_max = 3.2e4 # µm2
+n_size = 19
+L_size = np.linspace(size_min, size_max, n_size)
+# compute cumulative weight
+L_cum_p_size = []
+for size in L_size:
+    # find interval
+    i_ref_size = 0
+    while not (L_ref_size[i_ref_size] <= size and size <= L_ref_size[i_ref_size+1]):
+        i_ref_size = i_ref_size + 1
+    # compute cumulative prob
+    cum_p_size = L_ref_cum_prob[i_ref_size] + (L_ref_cum_prob[i_ref_size+1]-L_ref_cum_prob[i_ref_size])/(L_ref_size[i_ref_size+1]-L_ref_size[i_ref_size])*(size-L_ref_size[i_ref_size])
+    L_cum_p_size.append(cum_p_size)
+# compute the weight
+L_p_size = []
+for i_size in range(len(L_size)):
+    if i_size == 0:
+        p_size = (L_cum_p_size[i_size+1]-L_cum_p_size[i_size])/(L_size[i_size+1]-L_size[i_size])
+    if 0 < i_size and i_size < len(L_size)-1:
+        p_size = (L_cum_p_size[i_size+1]-L_cum_p_size[i_size-1])/(L_size[i_size+1]-L_size[i_size-1])
+    if i_size == len(L_size)-1:
+        p_size = (L_cum_p_size[i_size]-L_cum_p_size[i_size-1])/(L_size[i_size]-L_size[i_size-1])
+    L_p_size.append(p_size*100)
+
+# plot
+fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,9), num=1)
+ax1.scatter(L_S_cement_pp[:-1], L_n_S_cement_pp)
+#ax1.scatter(L_size, L_p_size)
+ax2.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp)
+#ax2.scatter(L_size, L_cum_p_size)
+plt.savefig('seg/S_cement_resume2.png')
 plt.close()
