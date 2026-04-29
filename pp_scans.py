@@ -442,13 +442,13 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                 L_ij_contact.append((i_grain, j_grain))
                 L_L_xyz_contact.append(L_yxz_contact)
                 L_parameter_contact.append([radius_i, radius_j, distance_ij])
-                # print
-                fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
-                ax1.imshow(M_bin_2grains_cement[:, :, int((z_max_box+z_min_box)/2)])
-                ax2.imshow(M_bin_2grains_cement[:, int((y_max_box+y_min_box)/2), :])
-                ax3.imshow(M_bin_2grains_cement[int((x_max_box+x_min_box)/2), :, :])
-                plt.savefig('seg/c_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
-                plt.close()
+                # plot
+                #fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+                #ax1.imshow(M_bin_2grains_cement_plot[:, :, int((z_max_box+z_min_box)/2)], cmap='nipy_spectral')
+                #ax2.imshow(M_bin_2grains_cement_plot[:, int((y_max_box+y_min_box)/2), :], cmap='nipy_spectral')
+                #ax3.imshow(M_bin_2grains_cement_plot[int((x_max_box+x_min_box)/2), :, :], cmap='nipy_spectral')
+                #plt.savefig('seg/contact_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
+                #plt.close()
 
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_bin_cement[:, :, int(M_bin_cement.shape[2]/2)])
