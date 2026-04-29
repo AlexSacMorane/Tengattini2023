@@ -252,8 +252,8 @@ if not Path('seg/tempo_save.dict').exists():
     ax1.imshow(shuffled_labels[:, :, int(shuffled_labels.shape[2]/2)])
     ax2.imshow(shuffled_labels[:, int(shuffled_labels.shape[2]/2), :])
     ax3.imshow(shuffled_labels[int(shuffled_labels.shape[2]/2), :, :])
-    ax4.scatter(L_radius_small, L_NCC_small, color='r')
-    ax4.scatter(L_radius_large, L_NCC_large, color='b')
+    ax4.scatter(L_radius_small, L_NCC_small, color='r', marker='x')
+    ax4.scatter(L_radius_large, L_NCC_large, color='g')
     plt.savefig('seg/grain_resume.png')
     plt.close()
 
