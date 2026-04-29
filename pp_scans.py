@@ -490,18 +490,50 @@ print('Cement :', round(np.sum(M_prediction_cement)/M_prediction_cement.size, 2)
 
 # iterate on  the cement bridge
 L_S_cement = []
+L_S_cement_weighted = []
+# see sensibility
+#L_S_cement_sens_mm = []
+#L_S_cement_sens_mp = []
+#L_S_cement_sens_pm = []
+#L_S_cement_sens_pp = []
+# iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
-    # height of cement*
+    # height of cement
     H_cement = L_parameter_contact[i_cement][2] + 4/3*((-L_parameter_contact[i_cement][0]**3+\
                                                        2*L_parameter_contact[i_cement][0]**2*L_parameter_contact[i_cement][1]+\
                                                        2*L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]**2-\
                                                        L_parameter_contact[i_cement][1]**3)/\
                                                  (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2)
+    # see the sensibility
+    # no influence
+    #H_cement_mm = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]-0.5)**3+\
+    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)**2*(L_parameter_contact[i_cement][1]-0.5)+\
+    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)*(L_parameter_contact[i_cement][1]-0.5)**2-\
+    #                                                   (L_parameter_contact[i_cement][1]-0.5)**3)/\
+    #                                             (L_parameter_contact[i_cement][0]-0.5+L_parameter_contact[i_cement][1]-0.5)**2)
+    #H_cement_mp = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]-0.5)**3+\
+    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)**2*(L_parameter_contact[i_cement][1]+0.5)+\
+    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)*(L_parameter_contact[i_cement][1]+0.5)**2-\
+    #                                                   (L_parameter_contact[i_cement][1]+0.5)**3)/\
+    #                                             (L_parameter_contact[i_cement][0]-0.5+L_parameter_contact[i_cement][1]+0.5)**2)
+    #H_cement_pm = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]+0.5)**3+\
+    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)**2*(L_parameter_contact[i_cement][1]-0.5)+\
+    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)*(L_parameter_contact[i_cement][1]-0.5)**2-\
+    #                                                   (L_parameter_contact[i_cement][1]-0.5)**3)/\
+    #                                             (L_parameter_contact[i_cement][0]+0.5+L_parameter_contact[i_cement][1]-0.5)**2)
+    #H_cement_pp = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]+0.5)**3+\
+    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)**2*(L_parameter_contact[i_cement][1]+0.5)+\
+    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)*(L_parameter_contact[i_cement][1]+0.5)**2-\
+    #                                                   (L_parameter_contact[i_cement][1]+0.5)**3)/\
+    #                                             (L_parameter_contact[i_cement][0]+0.5+L_parameter_contact[i_cement][1]+0.5)**2)
     # compute the equivalent volume
     V_cement = 0
+    V_cement_weighted = 0
     for i_xyz in range(len(L_L_xyz_contact[i_cement])):
-        # volume of cement
-        V_cement = V_cement+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
+        V_cement = V_cement+1
+        # apply a weight according to the number of participation of the cement in the contacts
+        # comment the other one if you use this one
+        V_cement_weighted = V_cement_weighted+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
     # compute the equivalent section 
     L_S_cement.append(V_cement/H_cement)
     L_S_cement_weighted.append(V_cement_weighted/H_cement)
