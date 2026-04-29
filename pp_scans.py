@@ -101,11 +101,30 @@ for i_z in range(i_z_max-i_z_min):
     # add to the matrix
     M_bin[:, :, i_z] = z_section
 
-# extract grain and cement
+#-------------------------------------------------------------------------------
+#Segmentation of grain
+#-------------------------------------------------------------------------------
+
 print('Extract phases')
 M_bin_pore = M_bin == 0
 M_bin_cement = M_bin == 128
 M_bin_grain = M_bin == 255
+
+# plot
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+ax1.imshow(M_bin[:, :, int(M_bin.shape[2]/2)])
+ax2.imshow(M_bin[:, int(M_bin.shape[2]/2), :])
+ax3.imshow(M_bin[int(M_bin.shape[2]/2), :, :])
+plt.savefig('seg/ctscan_resume.png')
+plt.close()
+
+# plot
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+ax1.imshow(M_bin_cement[:, :, int(M_bin_cement.shape[2]/2)])
+ax2.imshow(M_bin_cement[:, int(M_bin_cement.shape[2]/2), :])
+ax3.imshow(M_bin_cement[int(M_bin_cement.shape[2]/2), :, :])
+plt.savefig('seg/cement_resume.png')
+plt.close()
 
 if not Path('seg/tempo_save.dict').exists():
 
