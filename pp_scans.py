@@ -57,12 +57,23 @@ def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
 size_subrev = 125
 
 # extraction
-i_x_min = 700 #450
-i_x_max = 800 #i_x_min+size_subrev*4
-i_y_min = 700 #475
-i_y_max = 800 #i_y_min+size_subrev*4
-i_z_min = 800 #150
-i_z_max = 900 #i_z_min+size_subrev*10
+margin = 10 # to avoid border effect
+i_x_min = 575-margin #450
+i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
+i_y_min = 600-margin #475
+i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
+i_z_min = 160-margin #150
+i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
+
+# conversion pixel to µm
+pixel_to_um_135 = 13.5 # µm/pixel
+pixel_to_um_148 = 14.8 # µm/pixel
+
+# create the segmentation dict
+dict_seg = {}
+name_dict_seg = 'dict_seg_'+str(i_x_min+margin)+'_'+str(i_x_max-2*margin)+'_'\
+                           +str(i_y_min+margin)+'_'+str(i_y_max-2*margin)+'_'\
+                           +str(i_z_min+margin)+'_'+str(i_z_max-2*margin)+'.dict'
 
 #-------------------------------------------------------------------------------
 #Read data
