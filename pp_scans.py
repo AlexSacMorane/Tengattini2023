@@ -157,6 +157,8 @@ if not Path('seg/tempo_save.dict').exists():
     L_parameter_test_max = []
     # iterate on the labels
     for i_label in np.unique(M_bin_grain_labelled)[1:]:
+        print('label: ', i_label, '/', np.max(M_bin_grain_labelled))
+
         # extract the grain
         M_bin_grain_i = M_bin_grain_labelled == i_label
         # compute the center of mass
@@ -167,6 +169,7 @@ if not Path('seg/tempo_save.dict').exists():
         radius = (volume*3/4/math.pi)**(1/3)
 
         if radius < threshold_radius:
+            print('pass')
             # generate a approximation of the sphere
             M_bin_grain_i_test = np.zeros_like(M_bin_grain_i)
             for i_x in range(max(0, int(center[0]-1.2*radius)), min(M_bin_grain_i_test.shape[0], int(center[0]+1.2*radius))):
@@ -182,6 +185,7 @@ if not Path('seg/tempo_save.dict').exists():
                 L_radius_small.append(radius)
 
         if radius >= threshold_radius:
+            print('fit')
             # try to find a better fit 
             NCC_i_max = 0 
             L_radius_test = np.arange(radius-3, radius+3.1, 1)
@@ -229,6 +233,10 @@ if not Path('seg/tempo_save.dict').exists():
             fig.suptitle('NCC='+str(round(NCC_i_max, 2)))
             plt.savefig('seg/'+str(i_label)+'.png')
             plt.close()
+
+            # in the margin area
+            else:
+                print('not saved (in the margin area)')
 
     # plot
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
