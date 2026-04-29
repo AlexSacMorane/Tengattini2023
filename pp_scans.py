@@ -188,7 +188,7 @@ if not Path('seg/tempo_save.dict').exists():
             print('fit')
             # try to find a better fit 
             NCC_i_max = 0 
-            L_radius_test = np.arange(radius-3, radius+3.1, 1)
+            L_radius_test = np.arange(radius-2, radius+2.1, 1)
             L_center_x_test = np.arange(center[0]-2, center[0]+2.1, 1)
             L_center_y_test = np.arange(center[1]-2, center[1]+2.1, 1)
             L_center_z_test = np.arange(center[2]-2, center[2]+2.1, 1)
