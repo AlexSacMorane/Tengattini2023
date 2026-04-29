@@ -147,6 +147,9 @@ if not Path('seg/tempo_save.dict').exists():
     for i, old_label in enumerate(unique_labels):
         shuffled_labels[M_bin_grain_labelled == old_label] = i + 1  # On évite le 0 pour le fond
 
+    # prepare a map for the grain in the domain only
+    M_bin_grain_extract = np.zeros_like(M_bin_grain, dtype=bool)
+
     # determine the best sphere for each grain
     print('Segmentate spheres')
     # define a threshold value
@@ -223,6 +226,9 @@ if not Path('seg/tempo_save.dict').exists():
                 margin < parameter_test_max[2] and parameter_test_max[2] < M_bin_grain_i.shape[1]-margin and \
                 margin < parameter_test_max[3] and parameter_test_max[3] < M_bin_grain_i.shape[2]-margin:
 
+                # update the map of reference
+                M_bin_grain_extract = M_bin_grain_extract + M_bin_grain_i.copy()
+            
                 # save
                 L_M_bin_grain_i_max.append(M_bin_grain_i_max)
                 L_parameter_test_max.append(parameter_test_max)
@@ -329,31 +335,29 @@ ax1.legend()
 plt.savefig('seg/radius_resume.png')
 plt.close()
 
-'''
-# Do not compute the NCC for the grain as it will be low. A lot of them are in the margin areas and are not segmented
 # rebuild the prediction of the microstructure (grain)
-M_bin_grain_predicted = np.zeros_like(M_bin_grain)
+M_bin_grain_predicted = np.zeros_like(M_bin_grain_extract)
 for M_bin_grain_i_max in L_M_bin_grain_i_max:
     M_bin_grain_predicted = M_bin_grain_predicted + M_bin_grain_i_max
 # characterize the segmentation of the grain
 S_12 = 0
 S_11 = 0
 S_22 = 0
-M_prediction_grain = np.ones_like(M_bin_grain)
-for i_x in range(M_bin_grain.shape[0]):
-    for i_y in range(M_bin_grain.shape[1]):
-        for i_z in range(M_bin_grain.shape[2]):
+M_prediction_grain = np.ones_like(M_bin_grain_extract)
+for i_x in range(M_bin_grain_extract.shape[0]):
+    for i_y in range(M_bin_grain_extract.shape[1]):
+        for i_z in range(M_bin_grain_extract.shape[2]):
             # NCC
-            S_12 = S_12 + M_bin_grain[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
-            S_11 = S_11 + M_bin_grain[i_x,i_y,i_z] * M_bin_grain[i_x,i_y,i_z]
+            S_12 = S_12 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+            S_11 = S_11 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_extract[i_x,i_y,i_z]
             S_22 = S_22 + M_bin_grain_predicted[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
             # other comparison
-            if M_bin_grain[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
+            if M_bin_grain_extract[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
                 M_prediction_grain[i_x, i_y, i_z] = True
             else : 
                 M_prediction_grain[i_x, i_y, i_z] = False
-print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2), '% well segmented', \
-                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')'''
+print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2)*100, '% well segmented', \
+                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')
 
 #-------------------------------------------------------------------------------
 #Segmentation of cement
