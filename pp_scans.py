@@ -492,7 +492,8 @@ L_S_cement_weighted = []
 # iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
     # height of cement
-    H_cement = L_parameter_contact[i_cement][2] + 4/3*((-L_parameter_contact[i_cement][0]**3+\
+    H_cement = (L_parameter_contact[i_cement][2]-L_parameter_contact[i_cement][0]-L_parameter_contact[i_cement][1]) +\
+                                                       4/3*((-L_parameter_contact[i_cement][0]**3+\
                                                        2*L_parameter_contact[i_cement][0]**2*L_parameter_contact[i_cement][1]+\
                                                        2*L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]**2-\
                                                        L_parameter_contact[i_cement][1]**3)/\
