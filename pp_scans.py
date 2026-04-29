@@ -481,7 +481,12 @@ for i_x in range(M_bin_grain.shape[0]):
                 M_prediction_cement[i_x, i_y, i_z] = True
             else : 
                 M_prediction_cement[i_x, i_y, i_z] = False
-print('Cement :',np.sum(M_prediction_cement)/M_prediction_cement.size, S_12/(S_11*S_22)**(1/2))
+print('Cement :', round(np.sum(M_prediction_cement)/M_prediction_cement.size, 2)*100, '% well segmented',\
+                  round(S_12/(S_11*S_22)**(1/2), 2), 'for NCC')
+
+#-------------------------------------------------------------------------------
+#Determine the cement surface at the contact
+#-------------------------------------------------------------------------------
 
 # iterate on  the cement bridge
 L_S_cement = []
