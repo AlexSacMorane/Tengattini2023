@@ -214,25 +214,34 @@ if not Path('seg/tempo_save.dict').exists():
                                     NCC_i_max = NCC_i
                                     parameter_test_max = (radius_test, center_x_test, center_y_test, center_z_test)
                                     M_bin_grain_i_max = M_bin_grain_i_test.copy()
-            # save
-            L_M_bin_grain_i_max.append(M_bin_grain_i_max)
-            L_parameter_test_max.append(parameter_test_max)
-            # save for plot
-            L_NCC_large.append(NCC_i_max)
-            L_radius_large.append(parameter_test_max[0])
-            # plot
-            fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(16,9), num=1)
-            # labeled
-            ax1.imshow(M_bin_grain_i[:,:,int(parameter_test_max[3])])
-            ax2.imshow(M_bin_grain_i[:,int(parameter_test_max[2]),:])
-            ax3.imshow(M_bin_grain_i[int(parameter_test_max[1]),:,:])
-            # test
-            ax4.imshow(M_bin_grain_i_max[:,:,int(parameter_test_max[3])])
-            ax5.imshow(M_bin_grain_i_max[:,int(parameter_test_max[2]),:])
-            ax6.imshow(M_bin_grain_i_max[int(parameter_test_max[1]),:,:])
-            fig.suptitle('NCC='+str(round(NCC_i_max, 2)))
-            plt.savefig('seg/'+str(i_label)+'.png')
-            plt.close()
+            
+            # save only if the grain is in the domain of study
+            if margin < parameter_test_max[1] and parameter_test_max[1] < M_bin_grain_i.shape[0]-margin and \
+                margin < parameter_test_max[2] and parameter_test_max[2] < M_bin_grain_i.shape[1]-margin and \
+                margin < parameter_test_max[3] and parameter_test_max[3] < M_bin_grain_i.shape[2]-margin:
+
+                # save
+                L_M_bin_grain_i_max.append(M_bin_grain_i_max)
+                L_parameter_test_max.append(parameter_test_max)
+                # save for plot
+                L_NCC_large.append(NCC_i_max)
+                L_radius_large.append(parameter_test_max[0])
+                # plot
+                #fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(16,9), num=1)
+                # labeled
+                #ax1.imshow(M_bin_grain_i[:,:,int(parameter_test_max[3])])
+                #ax2.imshow(M_bin_grain_i[:,int(parameter_test_max[2]),:])
+                #ax3.imshow(M_bin_grain_i[int(parameter_test_max[1]),:,:])
+                # test
+                #ax4.imshow(M_bin_grain_i_max[:,:,int(parameter_test_max[3])])
+                #ax5.imshow(M_bin_grain_i_max[:,int(parameter_test_max[2]),:])
+                #ax6.imshow(M_bin_grain_i_max[int(parameter_test_max[1]),:,:])
+                # close
+                #ax2.set_title('ct-scan')
+                #ax5.set_title('segmentation')
+                #fig.suptitle('NCC='+str(round(NCC_i_max, 2)))
+                #plt.savefig('seg/grain_'+str(i_label)+'.png')
+                #plt.close()
 
             # in the margin area
             else:
