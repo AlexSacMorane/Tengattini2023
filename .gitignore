@@ -15,4 +15,4 @@ plot
 save
 vtk
 scan
-seg
+seg*
