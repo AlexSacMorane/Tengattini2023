@@ -327,6 +327,8 @@ ax1.legend()
 plt.savefig('seg/radius_resume.png')
 plt.close()
 
+'''
+# Do not compute the NCC for the grain as it will be low. A lot of them are in the margin areas and are not segmented
 # rebuild the prediction of the microstructure (grain)
 M_bin_grain_predicted = np.zeros_like(M_bin_grain)
 for M_bin_grain_i_max in L_M_bin_grain_i_max:
@@ -348,7 +350,12 @@ for i_x in range(M_bin_grain.shape[0]):
                 M_prediction_grain[i_x, i_y, i_z] = True
             else : 
                 M_prediction_grain[i_x, i_y, i_z] = False
-print('Grain :', np.sum(M_prediction_grain)/M_prediction_grain.size, S_12/(S_11*S_22)**(1/2))
+print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2), '% well segmented', \
+                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')'''
+
+#-------------------------------------------------------------------------------
+#Segmentation of cement
+#-------------------------------------------------------------------------------
 
 # determine contact with cement
 print('Segmentate the cement')
