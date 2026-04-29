@@ -299,16 +299,12 @@ for parameter in L_parameter_test_max:
 # compute the distribution of the radius
 n_pp = 20
 L_radius_135_pp = np.linspace(min(L_radius_135), max(L_radius_135), n_pp)
-L_n_radius_135_pp = np.zeros((n_pp-1,))
-L_cum_n_radius_135_pp = np.zeros((n_pp-1,))
-L_n_radius_135_pp, L_cum_n_radius_135_pp = compute_distribution(L_radius_135, L_radius_135_pp, L_n_radius_135_pp, L_cum_n_radius_135_pp)
+L_n_radius_135_pp, L_cum_n_radius_135_pp = compute_distribution(L_radius_135, L_radius_135_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
 # compute the distribution of the radius
 n_pp = 20
 L_radius_148_pp = np.linspace(min(L_radius_148), max(L_radius_148), n_pp)
-L_n_radius_148_pp = np.zeros((n_pp-1,))
-L_cum_n_radius_148_pp = np.zeros((n_pp-1,))
-L_n_radius_148_pp, L_cum_n_radius_148_pp = compute_distribution(L_radius_148, L_radius_148_pp, L_n_radius_148_pp, L_cum_n_radius_148_pp)
+L_n_radius_148_pp, L_cum_n_radius_148_pp = compute_distribution(L_radius_148, L_radius_148_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
 # distribution of the radius for the dem
 rMean = 275/2  # m
@@ -435,7 +431,7 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                                     # interpolate the radius of the truncated cylinder
                                     radius_cylinder = (1-distance_projected_point/distance_ij)*radius_i + distance_projected_point/distance_ij*radius_j
                                     # determine if the cement is located in the truncated cylinder
-                                    if distance_point < radius_cylinder:
+                                    if distance_point <= radius_cylinder:
                                         M_n_active_cement[i_x, i_y, i_z] = M_n_active_cement[i_x, i_y, i_z] + 1
                                         L_yxz_contact.append((i_x, i_y, i_z))
                                         # for plot only
@@ -493,11 +489,6 @@ print('Cement :', round(np.sum(M_prediction_cement)/M_prediction_cement.size, 2)
 # iterate on  the cement bridge
 L_S_cement = []
 L_S_cement_weighted = []
-# see sensibility
-#L_S_cement_sens_mm = []
-#L_S_cement_sens_mp = []
-#L_S_cement_sens_pm = []
-#L_S_cement_sens_pp = []
 # iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
     # height of cement
@@ -506,44 +497,16 @@ for i_cement in range(len(L_L_xyz_contact)):
                                                        2*L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]**2-\
                                                        L_parameter_contact[i_cement][1]**3)/\
                                                  (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2)
-    # see the sensibility
-    # no influence
-    #H_cement_mm = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]-0.5)**3+\
-    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)**2*(L_parameter_contact[i_cement][1]-0.5)+\
-    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)*(L_parameter_contact[i_cement][1]-0.5)**2-\
-    #                                                   (L_parameter_contact[i_cement][1]-0.5)**3)/\
-    #                                             (L_parameter_contact[i_cement][0]-0.5+L_parameter_contact[i_cement][1]-0.5)**2)
-    #H_cement_mp = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]-0.5)**3+\
-    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)**2*(L_parameter_contact[i_cement][1]+0.5)+\
-    #                                                   2*(L_parameter_contact[i_cement][0]-0.5)*(L_parameter_contact[i_cement][1]+0.5)**2-\
-    #                                                   (L_parameter_contact[i_cement][1]+0.5)**3)/\
-    #                                             (L_parameter_contact[i_cement][0]-0.5+L_parameter_contact[i_cement][1]+0.5)**2)
-    #H_cement_pm = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]+0.5)**3+\
-    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)**2*(L_parameter_contact[i_cement][1]-0.5)+\
-    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)*(L_parameter_contact[i_cement][1]-0.5)**2-\
-    #                                                   (L_parameter_contact[i_cement][1]-0.5)**3)/\
-    #                                             (L_parameter_contact[i_cement][0]+0.5+L_parameter_contact[i_cement][1]-0.5)**2)
-    #H_cement_pp = L_parameter_contact[i_cement][2] + 4/3*((-(L_parameter_contact[i_cement][0]+0.5)**3+\
-    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)**2*(L_parameter_contact[i_cement][1]+0.5)+\
-    #                                                   2*(L_parameter_contact[i_cement][0]+0.5)*(L_parameter_contact[i_cement][1]+0.5)**2-\
-    #                                                   (L_parameter_contact[i_cement][1]+0.5)**3)/\
-    #                                             (L_parameter_contact[i_cement][0]+0.5+L_parameter_contact[i_cement][1]+0.5)**2)
     # compute the equivalent volume
     V_cement = 0
     V_cement_weighted = 0
     for i_xyz in range(len(L_L_xyz_contact[i_cement])):
         V_cement = V_cement+1
         # apply a weight according to the number of participation of the cement in the contacts
-        # comment the other one if you use this one
         V_cement_weighted = V_cement_weighted+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
     # compute the equivalent section 
     L_S_cement.append(V_cement/H_cement)
     L_S_cement_weighted.append(V_cement_weighted/H_cement)
-    # see the sensibility
-    #L_S_cement_sens_mm.append(V_cement/H_cement_mm)
-    #L_S_cement_sens_mp.append(V_cement/H_cement_mp)
-    #L_S_cement_sens_pm.append(V_cement/H_cement_pm)
-    #L_S_cement_sens_pp.append(V_cement/H_cement_pp)
 
 # finish to save the output of the segmentation
 dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
@@ -560,11 +523,6 @@ L_S_cement_pp = np.linspace(min(L_S_cement),max(L_S_cement),n_pp)
 L_S_cement_weighted_pp = np.linspace(min(L_S_cement_weighted),max(L_S_cement_weighted),n_pp)
 L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-# see the sensibility
-#L_n_S_cement_mm_pp, L_cum_n_S_cement_mm_pp = compute_distribution(L_S_cement_sens_mm, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-#L_n_S_cement_mp_pp, L_cum_n_S_cement_mp_pp = compute_distribution(L_S_cement_sens_mp, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-#L_n_S_cement_pm_pp, L_cum_n_S_cement_pm_pp = compute_distribution(L_S_cement_sens_pm, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-#L_n_S_cement_pp_pp, L_cum_n_S_cement_pp_pp = compute_distribution(L_S_cement_sens_pp, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
 # convert in µm
 L_S_cement_pp_135 = []
@@ -592,16 +550,6 @@ for size in L_size_8:
     # compute cumulative prob
     cum_p_size = L_ref_cum_prob_8[i_ref_size] + (L_ref_cum_prob_8[i_ref_size+1]-L_ref_cum_prob_8[i_ref_size])/(L_ref_size_8[i_ref_size+1]-L_ref_size_8[i_ref_size])*(size-L_ref_size_8[i_ref_size])
     L_cum_p_size_8.append(cum_p_size)
-# compute the weight
-L_p_size_8 = []
-for i_size in range(len(L_size_8)):
-    if i_size == 0:
-        p_size = (L_cum_p_size_8[i_size+1]-L_cum_p_size_8[i_size])/(L_size_8[i_size+1]-L_size_8[i_size])
-    if 0 < i_size and i_size < len(L_size_8)-1:
-        p_size = (L_cum_p_size_8[i_size+1]-L_cum_p_size_8[i_size-1])/(L_size_8[i_size+1]-L_size_8[i_size-1])
-    if i_size == len(L_size_8)-1:
-        p_size = (L_cum_p_size_8[i_size]-L_cum_p_size_8[i_size-1])/(L_size_8[i_size]-L_size_8[i_size-1])
-    L_p_size_8.append(p_size)
 
 L_ref_size_6 = []
 for size in L_ref_size_8:
@@ -621,31 +569,22 @@ for size in L_size_6:
     # compute cumulative prob
     cum_p_size = L_ref_cum_prob_6[i_ref_size] + (L_ref_cum_prob_6[i_ref_size+1]-L_ref_cum_prob_6[i_ref_size])/(L_ref_size_6[i_ref_size+1]-L_ref_size_6[i_ref_size])*(size-L_ref_size_6[i_ref_size])
     L_cum_p_size_6.append(cum_p_size)
-# compute the weight
-L_p_size_6 = []
-for i_size in range(len(L_size_6)):
-    if i_size == 0:
-        p_size = (L_cum_p_size_6[i_size+1]-L_cum_p_size_6[i_size])/(L_size_6[i_size+1]-L_size_6[i_size])
-    if 0 < i_size and i_size < len(L_size_6)-1:
-        p_size = (L_cum_p_size_6[i_size+1]-L_cum_p_size_6[i_size-1])/(L_size_6[i_size+1]-L_size_6[i_size-1])
-    if i_size == len(L_size_6)-1:
-        p_size = (L_cum_p_size_6[i_size]-L_cum_p_size_6[i_size-1])/(L_size_6[i_size]-L_size_6[i_size-1])
-    L_p_size_6.append(p_size)
-
 
 # plot
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
-#ax1.scatter(L_S_cement_pp_135[:-1], L_cum_n_S_cement_pp, label='ct-scan (13.5 um/pixel)')
-#ax1.scatter(L_S_cement_pp_148[:-1], L_cum_n_S_cement_pp, label='ct-scan (14.8 um/pixel)')
 ax1.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label='ct-scan')
 ax1.scatter(L_size_8, L_cum_p_size_8, label='article (8%)', color='k')
 ax1.scatter(L_size_6, L_cum_p_size_6, label='article (6%)', color='gray')
+ax1.set_xlabel('size (pixel^2)')
+ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
 plt.savefig('seg/S_cement_resume.png')
 plt.close()
 
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
 ax1.scatter(L_S_cement_weighted_pp_148[:-1], L_cum_n_S_cement_weighted_pp, label='ct-scan (14.8 um/pixel)')
+ax1.set_xlabel('size (um^2)')
+ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
 plt.savefig('seg/S_cement_weighthed_resume.png')
 plt.close()
