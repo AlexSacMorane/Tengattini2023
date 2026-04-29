@@ -363,8 +363,24 @@ L_ij_contact = []
 L_L_xyz_contact = []
 L_parameter_contact = []
 M_n_active_cement = np.zeros_like(M_bin_cement, dtype=int)
+# iterate on pair of grains
 for i_grain in range(len(L_M_bin_grain_i_max)-1):
     for j_grain in range(i_grain+1, len(L_M_bin_grain_i_max)):
+        print('couple: ', i_grain, '-', j_grain, '(max ='+str(len(L_M_bin_grain_i_max)-1)+')')
+
+        # plot only (slowdown the code)
+        #M_bin_2grains_cement_plot = np.zeros_like(M_bin_cement, dtype=int)
+        #for i_x in range(0, M_bin_2grains_cement_plot.shape[0]):
+        #    for i_y in range(0, M_bin_2grains_cement_plot.shape[1]):
+        #        for i_z in range(0, M_bin_2grains_cement_plot.shape[2]):
+        #            if M_bin_grain[i_x, i_y, i_z]:
+        #                if L_M_bin_grain_i_max[i_grain][i_x, i_y, i_z] or L_M_bin_grain_i_max[j_grain][i_x, i_y, i_z]:
+        #                    M_bin_2grains_cement_plot[i_x, i_y, i_z] = 1 # grain
+        #                else:
+        #                    M_bin_2grains_cement_plot[i_x, i_y, i_z] = 3 # grain but not in the contact
+        #            if M_bin_cement[i_x, i_y, i_z]:
+        #                M_bin_2grains_cement_plot[i_x, i_y, i_z] = 4 # cement but not in the contact
+        
         # compute the combination of the 2 grains and the cement phase
         M_bin_2grains_cement = M_bin_cement + L_M_bin_grain_i_max[i_grain] + L_M_bin_grain_i_max[j_grain]
         # label this map
