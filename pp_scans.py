@@ -382,23 +382,27 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
         #                M_bin_2grains_cement_plot[i_x, i_y, i_z] = 4 # cement but not in the contact
         
         # compute the combination of the 2 grains and the cement phase
-        M_bin_2grains_cement = M_bin_cement + L_M_bin_grain_i_max[i_grain] + L_M_bin_grain_i_max[j_grain]
+        M_bin_2grains_cement = M_bin_cement.copy() + L_M_bin_grain_i_max[i_grain].copy() + L_M_bin_grain_i_max[j_grain].copy()
         # label this map
         M_bin_2grains_cement_labelled, n_2grains_cement = ndi.label(M_bin_2grains_cement)
+                
         # extract the data of the two grains
         center_i = np.array([L_parameter_test_max[i_grain][1], L_parameter_test_max[i_grain][2], L_parameter_test_max[i_grain][3]])
         radius_i = L_parameter_test_max[i_grain][0]
         center_j = np.array([L_parameter_test_max[j_grain][1], L_parameter_test_max[j_grain][2], L_parameter_test_max[j_grain][3]])
         radius_j = L_parameter_test_max[j_grain][0]
+
         # compute parameters of the segment C_i->C_j
         vector_ij = center_j-center_i
         distance_ij = np.linalg.norm(vector_ij)
         vector_ij = vector_ij/distance_ij # normalization
+
         # consider a criterion on the distance
         if distance_ij < radius_i*1.1 + radius_j*1.1:
             # check the contact with a common label
             if M_bin_2grains_cement_labelled[int(center_i[0]), int(center_i[1]), int(center_i[2])] == \
                M_bin_2grains_cement_labelled[int(center_j[0]), int(center_j[1]), int(center_j[2])]: # contact
+                
                 # determine the box of investigation
                 x_min_box = int(max(0, min(center_i[0]-radius_i, center_j[0]-radius_j)))
                 x_max_box = int(min(M_bin_2grains_cement_labelled.shape[0], max(center_i[0]+radius_i, center_j[0]+radius_j)+1))
@@ -406,6 +410,7 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                 y_max_box = int(min(M_bin_2grains_cement_labelled.shape[1], max(center_i[1]+radius_i, center_j[1]+radius_j)+1))
                 z_min_box = int(max(0, min(center_i[2]-radius_i, center_j[2]-radius_j)))
                 z_max_box = int(min(M_bin_2grains_cement_labelled.shape[2], max(center_i[2]+radius_i, center_j[2]+radius_j)+1))
+
                 # iterate in the box of investigation
                 L_yxz_contact = []
                 for i_x in range(x_min_box, x_max_box):
@@ -413,6 +418,7 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                         for i_z in range(z_min_box, z_max_box):
                             # check if there is cement
                             if M_bin_cement[i_x, i_y, i_z]:   
+                                # project the point on the segment C_i->C_j
                                 point = np.array([i_x , i_y, i_z])
                                 vector_ipoint = point-center_i
                                 distance_projected_point = np.dot(vector_ipoint, vector_ij)
@@ -423,12 +429,15 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                                     # determine the distance between the projected point and the point
                                     vector_projectedpointpoint = point - projectedpoint
                                     distance_point = np.linalg.norm(vector_projectedpointpoint)
+                                    
                                     # interpolate the radius of the truncated cylinder
                                     radius_cylinder = (1-distance_projected_point/distance_ij)*radius_i + distance_projected_point/distance_ij*radius_j
                                     # determine if the cement is located in the truncated cylinder
                                     if distance_point < radius_cylinder:
                                         M_n_active_cement[i_x, i_y, i_z] = M_n_active_cement[i_x, i_y, i_z] + 1
                                         L_yxz_contact.append((i_x, i_y, i_z))
+                                        # for plot only
+                                        #M_bin_2grains_cement_plot[i_x, i_y, i_z] = 2 # cement in the contact
                 # save
                 L_ij_contact.append((i_grain, j_grain))
                 L_L_xyz_contact.append(L_yxz_contact)
