@@ -455,15 +455,15 @@ fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_n_active_cement[:, :, int(M_n_active_cement.shape[2]/2)])
 ax2.imshow(M_n_active_cement[:, int(M_n_active_cement.shape[2]/2), :])
 ax3.imshow(M_n_active_cement[int(M_n_active_cement.shape[2]/2), :, :])
+# compute histogram of the number of active cement
+hist, bin_edges = np.histogram(M_n_active_cement[M_n_active_cement > 0], bins=np.arange(1, np.max(M_n_active_cement)+1)-0.5)
+ax4.hist(bin_edges[:-1], bin_edges, weights=hist)
 plt.savefig('seg/cement_n_active_resume.png')
 plt.close()
 
 # characterize the segmentation of the cement
 S_12 = 0
 S_11 = 0
-# compute histogram of the number of active cement
-hist, bin_edges = np.histogram(M_n_active_cement[M_n_active_cement > 0], bins=np.arange(1, np.max(M_n_active_cement)+1)-0.5)
-ax4.hist(bin_edges[:-1], bin_edges, weights=hist)
 S_22 = 0
 M_prediction_cement = np.ones_like(M_bin_cement)
 for i_x in range(M_bin_grain.shape[0]):
