@@ -208,7 +208,7 @@ if not Path('seg/tempo_save.dict').exists():
                                         if distance <= radius_test:
                                             M_bin_grain_i_test[i_x, i_y, i_z]=1
                             # compute the NCC
-                            NCC_i=NCC(M_bin_grain_i, M_bin_grain_i_test, [center_x_test, center_y_test, center_z_test], radius_test)
+                            NCC_i = NCC(M_bin_grain_i, M_bin_grain_i_test, [center_x_test, center_y_test, center_z_test], radius_test)
                             if not math.isnan(NCC_i):
                                 if NCC_i >= NCC_i_max:
                                     NCC_i_max = NCC_i
