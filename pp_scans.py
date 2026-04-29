@@ -265,6 +265,16 @@ if not Path('seg/tempo_save.dict').exists():
     with open('seg/tempo_save.dict', 'wb') as handle:
             pickle.dump(dict_save, handle, protocol=pickle.HIGHEST_PROTOCOL) 
 
+    # start to save output of segmentation
+    L_rad = []
+    L_pos = []
+    for i_parameter in range(len(L_parameter_test_max)):
+        L_rad.append(L_parameter_test_max[0])
+        L_pos.append(np.array([L_parameter_test_max[1], L_parameter_test_max[2], L_parameter_test_max[3]]))
+    dict_seg['L_pos_pixel'] = L_pos.copy()
+    dict_seg['L_rad_pixel'] = L_rad.copy()
+    dict_seg['L_NCC_grain'] = L_NCC_large.copy()
+
 else :
     # load save
     with open('seg/tempo_save.dict', 'rb') as handle:
@@ -459,8 +469,22 @@ for i_cement in range(len(L_L_xyz_contact)):
         # volume of cement
         V_cement = V_cement+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
     # compute the equivalent section 
-    S_cement = V_cement/H_cement
-    L_S_cement.append(S_cement)
+    L_S_cement.append(V_cement/H_cement)
+    L_S_cement_weighted.append(V_cement_weighted/H_cement)
+    # see the sensibility
+    #L_S_cement_sens_mm.append(V_cement/H_cement_mm)
+    #L_S_cement_sens_mp.append(V_cement/H_cement_mp)
+    #L_S_cement_sens_pm.append(V_cement/H_cement_pm)
+    #L_S_cement_sens_pp.append(V_cement/H_cement_pp)
+
+# finish to save the output of the segmentation
+dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
+dict_seg['L_S_cement_weighted_pixel'] = L_S_cement_weighted.copy()
+dict_seg['L_ij_contact'] = L_ij_contact.copy()
+
+# write output of the segmentation 
+with open(name_dict_seg, 'wb') as handle:
+    pickle.dump(dict_seg, handle, protocol=pickle.HIGHEST_PROTOCOL) 
 
 # compute the distribution of the cement area
 n_pp = 20
