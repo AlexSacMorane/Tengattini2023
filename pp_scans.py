@@ -267,12 +267,22 @@ if not Path('seg/tempo_save.dict').exists():
     dict_seg['L_rad_pixel'] = L_rad.copy()
     dict_seg['L_NCC_grain'] = L_NCC_large.copy()
 
+    # tempo save
+    dict_save = {
+        'L_M_bin_grain_i_max': L_M_bin_grain_i_max,
+        'L_parameter_test_max': L_parameter_test_max,
+        'dict_seg': dict_seg
+    }
+    with open('seg/tempo_save.dict', 'wb') as handle:
+            pickle.dump(dict_save, handle, protocol=pickle.HIGHEST_PROTOCOL) 
+
 else :
     # load save
     with open('seg/tempo_save.dict', 'rb') as handle:
             dict_save = pickle.load(handle)
     L_M_bin_grain_i_max = dict_save['L_M_bin_grain_i_max']
     L_parameter_test_max = dict_save['L_parameter_test_max']
+    dict_seg = dict_save['dict_seg']
 
 #-------------------------------------------------------------------------------
 #Plot and characterization of the grain segmentation
