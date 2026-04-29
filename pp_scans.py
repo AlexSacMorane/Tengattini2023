@@ -31,6 +31,25 @@ def NCC(M1, M2, center, radius):
     return S_12/(S_11*S_22)**(1/2)
 
 #-------------------------------------------------------------------------------
+
+def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
+    '''
+    Compute the distribution (and its cumulative) of a list of values.
+    '''
+    # iterate on the list
+    for value in L_value:
+        i_pp = 0
+        while not(L_value_pp[i_pp]<=value and value<=L_value_pp[i_pp+1]):
+            i_pp = i_pp + 1
+        L_n_value_pp[i_pp] = L_n_value_pp[i_pp] + 1
+    # compute cumulative
+    for i in range(len(L_n_value_pp)):
+        L_cum_n_value_pp[i] = L_n_value_pp[i]/np.sum(L_n_value_pp)
+        if i > 0:
+            L_cum_n_value_pp[i] = L_cum_n_value_pp[i] + L_cum_n_value_pp[i-1]
+    return L_n_value_pp, L_cum_n_value_pp
+
+#-------------------------------------------------------------------------------
 #User
 #-------------------------------------------------------------------------------
 
@@ -206,32 +225,48 @@ else :
     L_M_bin_grain_i_max = dict_save['L_M_bin_grain_i_max']
     L_parameter_test_max = dict_save['L_parameter_test_max']
 
+#-------------------------------------------------------------------------------
+#Plot and characterization of the grain segmentation
+#-------------------------------------------------------------------------------
+
 # extract the radius
-L_radius = []
+L_radius_135 = []
+L_radius_148 = []
 # convert in µm
-pixel_to_um = 14.8 # µm/pixel
 for parameter in L_parameter_test_max:
-    L_radius.append(parameter[0]*pixel_to_um)
+    L_radius_135.append(parameter[0]*pixel_to_um_135)
+    L_radius_148.append(parameter[0]*pixel_to_um_148)
 
-# plot the PSD
+# compute the distribution of the radius
 n_pp = 20
-L_radius_pp = np.linspace(min(L_radius), max(L_radius), n_pp)
-L_n_radius_pp = np.zeros((n_pp-1,))
-for radius in L_radius_pp:
-    i_pp = 0
-    while not(L_radius_pp[i_pp]<=radius and radius<=L_radius_pp[i_pp+1]):
-        i_pp = i_pp + 1
-    L_n_radius_pp[i_pp] = L_n_radius_pp[i_pp] + 1
-# compute cumulative
-L_cum_n_radius_pp = np.zeros((n_pp-1,))
-for i in range(len(L_n_radius_pp)):
-    L_cum_n_radius_pp[i] = L_n_radius_pp[i]/np.sum(L_n_radius_pp)
-    if i > 0:
-        L_cum_n_radius_pp[i] = L_cum_n_radius_pp[i] + L_cum_n_radius_pp[i-1]
+L_radius_135_pp = np.linspace(min(L_radius_135), max(L_radius_135), n_pp)
+L_n_radius_135_pp = np.zeros((n_pp-1,))
+L_cum_n_radius_135_pp = np.zeros((n_pp-1,))
+L_n_radius_135_pp, L_cum_n_radius_135_pp = compute_distribution(L_radius_135, L_radius_135_pp, L_n_radius_135_pp, L_cum_n_radius_135_pp)
 
-fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,9), num=1)
-ax1.scatter(L_radius_pp[:-1], L_n_radius_pp)
-ax2.scatter(L_radius_pp[:-1], L_cum_n_radius_pp)
+# compute the distribution of the radius
+n_pp = 20
+L_radius_148_pp = np.linspace(min(L_radius_148), max(L_radius_148), n_pp)
+L_n_radius_148_pp = np.zeros((n_pp-1,))
+L_cum_n_radius_148_pp = np.zeros((n_pp-1,))
+L_n_radius_148_pp, L_cum_n_radius_148_pp = compute_distribution(L_radius_148, L_radius_148_pp, L_n_radius_148_pp, L_cum_n_radius_148_pp)
+
+# distribution of the radius for the dem
+rMean = 275/2  # m
+rRelFuzz = 0.449
+L_radius_theoretical = np.linspace((1-rRelFuzz)*rMean, (1+rRelFuzz)*rMean, 100)
+L_cum_n_radius_pp_theoretical = []
+for radius in L_radius_theoretical:
+    L_cum_n_radius_pp_theoretical.append((radius-min(L_radius_theoretical))/(max(L_radius_theoretical)-min(L_radius_theoretical)))
+
+# plot
+fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
+ax1.scatter(L_radius_135_pp[:-1], L_cum_n_radius_135_pp, label='ct-scan (13.5 um/pixel)')
+ax1.scatter(L_radius_148_pp[:-1], L_cum_n_radius_148_pp, label='ct-scan (14.8 um/pixel)')
+ax1.plot(L_radius_theoretical, L_cum_n_radius_pp_theoretical, label='dem')
+ax1.plot([275/2, 275/2], [0, 1], label='d50 article', color='k') 
+ax1.plot([275/2*0.9, 275/2*1.1], [0.5, 0.5], color='k') 
+ax1.legend()
 plt.savefig('seg/radius_resume.png')
 plt.close()
 
@@ -382,64 +417,96 @@ for i_cement in range(len(L_L_xyz_contact)):
 
 # compute the distribution of the cement area
 n_pp = 20
-L_S_cement_pp = np.linspace(min(L_S_cement), max(L_S_cement), n_pp)
-L_n_S_cement_pp = np.zeros((n_pp-1,))
-for S_cement in L_S_cement:
-    i_pp = 0
-    while not(L_S_cement_pp[i_pp]<=S_cement and S_cement<=L_S_cement_pp[i_pp+1]):
-        i_pp = i_pp + 1
-    L_n_S_cement_pp[i_pp] = L_n_S_cement_pp[i_pp] + 1
-# compute cumulative
-L_cum_n_S_cement_pp = np.zeros((n_pp-1,))
-for i in range(len(L_n_S_cement_pp)):
-    L_cum_n_S_cement_pp[i] = L_n_S_cement_pp[i]/np.sum(L_n_S_cement_pp)
-    if i > 0:
-        L_cum_n_S_cement_pp[i] = L_cum_n_S_cement_pp[i] + L_cum_n_S_cement_pp[i-1]
+L_S_cement_pp = np.linspace(min(L_S_cement),max(L_S_cement),n_pp)
+L_S_cement_weighted_pp = np.linspace(min(L_S_cement_weighted),max(L_S_cement_weighted),n_pp)
+L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+# see the sensibility
+#L_n_S_cement_mm_pp, L_cum_n_S_cement_mm_pp = compute_distribution(L_S_cement_sens_mm, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+#L_n_S_cement_mp_pp, L_cum_n_S_cement_mp_pp = compute_distribution(L_S_cement_sens_mp, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+#L_n_S_cement_pm_pp, L_cum_n_S_cement_pm_pp = compute_distribution(L_S_cement_sens_pm, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+#L_n_S_cement_pp_pp, L_cum_n_S_cement_pp_pp = compute_distribution(L_S_cement_sens_pp, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
-fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,9), num=1)
-ax1.scatter(L_S_cement_pp[:-1], L_n_S_cement_pp)
-ax2.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp)
+# convert in µm
+L_S_cement_pp_135 = []
+L_S_cement_pp_148 = []
+L_S_cement_weighted_pp_148 = []
+for i_S_cement_pp in range(len(L_S_cement_pp)):
+    L_S_cement_pp_135.append(L_S_cement_pp[i_S_cement_pp]*pixel_to_um_135*pixel_to_um_135)
+    L_S_cement_pp_148.append(L_S_cement_pp[i_S_cement_pp]*pixel_to_um_148*pixel_to_um_148)
+    L_S_cement_weighted_pp_148.append(L_S_cement_weighted_pp[i_S_cement_pp]*pixel_to_um_148*pixel_to_um_148)
+
+# reference value (8% of cement)
+L_ref_size_8     = [0,    7,   19,   28,   41,   48,   60,   76,  88,  100,   117,  130, 160]
+L_ref_cum_prob_8 = [0, 0.01, 0.08, 0.16, 0.32, 0.41, 0.54, 0.69, 0.78, 0.85, 0.91, 0.93,   1]
+size_min = 7 # pixel2
+size_max = 160 # pixel2
+n_size = 19
+L_size_8 = np.linspace(size_min, size_max, n_size)
+# compute cumulative weight
+L_cum_p_size_8 = []
+for size in L_size_8:
+    # find interval
+    i_ref_size = 0
+    while not (L_ref_size_8[i_ref_size] <= size and size <= L_ref_size_8[i_ref_size+1]):
+        i_ref_size = i_ref_size + 1
+    # compute cumulative prob
+    cum_p_size = L_ref_cum_prob_8[i_ref_size] + (L_ref_cum_prob_8[i_ref_size+1]-L_ref_cum_prob_8[i_ref_size])/(L_ref_size_8[i_ref_size+1]-L_ref_size_8[i_ref_size])*(size-L_ref_size_8[i_ref_size])
+    L_cum_p_size_8.append(cum_p_size)
+# compute the weight
+L_p_size_8 = []
+for i_size in range(len(L_size_8)):
+    if i_size == 0:
+        p_size = (L_cum_p_size_8[i_size+1]-L_cum_p_size_8[i_size])/(L_size_8[i_size+1]-L_size_8[i_size])
+    if 0 < i_size and i_size < len(L_size_8)-1:
+        p_size = (L_cum_p_size_8[i_size+1]-L_cum_p_size_8[i_size-1])/(L_size_8[i_size+1]-L_size_8[i_size-1])
+    if i_size == len(L_size_8)-1:
+        p_size = (L_cum_p_size_8[i_size]-L_cum_p_size_8[i_size-1])/(L_size_8[i_size]-L_size_8[i_size-1])
+    L_p_size_8.append(p_size)
+
+L_ref_size_6 = []
+for size in L_ref_size_8:
+    L_ref_size_6.append(size*6/8)
+L_ref_cum_prob_6 = L_ref_cum_prob_8
+size_min = 0.09e4 # µm2
+size_max = 2.28e4 # µm2
+n_size = 19
+L_size_6 = np.linspace(size_min, size_max, n_size)
+# compute cumulative weight
+L_cum_p_size_6 = []
+for size in L_size_6:
+    # find interval
+    i_ref_size = 0
+    while not (L_ref_size_6[i_ref_size] <= size and size <= L_ref_size_6[i_ref_size+1]):
+        i_ref_size = i_ref_size + 1
+    # compute cumulative prob
+    cum_p_size = L_ref_cum_prob_6[i_ref_size] + (L_ref_cum_prob_6[i_ref_size+1]-L_ref_cum_prob_6[i_ref_size])/(L_ref_size_6[i_ref_size+1]-L_ref_size_6[i_ref_size])*(size-L_ref_size_6[i_ref_size])
+    L_cum_p_size_6.append(cum_p_size)
+# compute the weight
+L_p_size_6 = []
+for i_size in range(len(L_size_6)):
+    if i_size == 0:
+        p_size = (L_cum_p_size_6[i_size+1]-L_cum_p_size_6[i_size])/(L_size_6[i_size+1]-L_size_6[i_size])
+    if 0 < i_size and i_size < len(L_size_6)-1:
+        p_size = (L_cum_p_size_6[i_size+1]-L_cum_p_size_6[i_size-1])/(L_size_6[i_size+1]-L_size_6[i_size-1])
+    if i_size == len(L_size_6)-1:
+        p_size = (L_cum_p_size_6[i_size]-L_cum_p_size_6[i_size-1])/(L_size_6[i_size]-L_size_6[i_size-1])
+    L_p_size_6.append(p_size)
+
+
+# plot
+fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
+#ax1.scatter(L_S_cement_pp_135[:-1], L_cum_n_S_cement_pp, label='ct-scan (13.5 um/pixel)')
+#ax1.scatter(L_S_cement_pp_148[:-1], L_cum_n_S_cement_pp, label='ct-scan (14.8 um/pixel)')
+ax1.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label='ct-scan')
+ax1.scatter(L_size_8, L_cum_p_size_8, label='article (8%)', color='k')
+ax1.scatter(L_size_6, L_cum_p_size_6, label='article (6%)', color='gray')
+ax1.legend()
 plt.savefig('seg/S_cement_resume.png')
 plt.close()
 
-# convert in µm
-pixel_to_um = 14.8 # µm/pixel
-for i_S_cement_pp in range(len(L_S_cement_pp)):
-    L_S_cement_pp[i_S_cement_pp] = L_S_cement_pp[i_S_cement_pp]*pixel_to_um*pixel_to_um
-
-# reference value
-L_ref_size     = [0, 0.08e4, 0.21e4, 0.36e4, 0.51e4, 0.73e4, 0.89e4, 1.05e4, 1.27e4, 1.56e4, 1.94e4, 2.55e4, 3.2e4]
-L_ref_cum_prob = [0,   0.01,   0.04,   0.10,   0.19,   0.33,   0.45,   0.56,   0.68,   0.81,   0.91,   0.97,     1]
-size_min = 0.08e4 # µm2
-size_max = 3.2e4 # µm2
-n_size = 19
-L_size = np.linspace(size_min, size_max, n_size)
-# compute cumulative weight
-L_cum_p_size = []
-for size in L_size:
-    # find interval
-    i_ref_size = 0
-    while not (L_ref_size[i_ref_size] <= size and size <= L_ref_size[i_ref_size+1]):
-        i_ref_size = i_ref_size + 1
-    # compute cumulative prob
-    cum_p_size = L_ref_cum_prob[i_ref_size] + (L_ref_cum_prob[i_ref_size+1]-L_ref_cum_prob[i_ref_size])/(L_ref_size[i_ref_size+1]-L_ref_size[i_ref_size])*(size-L_ref_size[i_ref_size])
-    L_cum_p_size.append(cum_p_size)
-# compute the weight
-L_p_size = []
-for i_size in range(len(L_size)):
-    if i_size == 0:
-        p_size = (L_cum_p_size[i_size+1]-L_cum_p_size[i_size])/(L_size[i_size+1]-L_size[i_size])
-    if 0 < i_size and i_size < len(L_size)-1:
-        p_size = (L_cum_p_size[i_size+1]-L_cum_p_size[i_size-1])/(L_size[i_size+1]-L_size[i_size-1])
-    if i_size == len(L_size)-1:
-        p_size = (L_cum_p_size[i_size]-L_cum_p_size[i_size-1])/(L_size[i_size]-L_size[i_size-1])
-    L_p_size.append(p_size*100)
-
-# plot
-fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,9), num=1)
-ax1.scatter(L_S_cement_pp[:-1], L_n_S_cement_pp)
-#ax1.scatter(L_size, L_p_size)
-ax2.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp)
-#ax2.scatter(L_size, L_cum_p_size)
-plt.savefig('seg/S_cement_resume2.png')
+fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
+ax1.scatter(L_S_cement_weighted_pp_148[:-1], L_cum_n_S_cement_weighted_pp, label='ct-scan (14.8 um/pixel)')
+ax1.legend()
+plt.savefig('seg/S_cement_weighthed_resume.png')
 plt.close()
