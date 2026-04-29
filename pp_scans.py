@@ -257,14 +257,6 @@ if not Path('seg/tempo_save.dict').exists():
     plt.savefig('seg/grain_resume.png')
     plt.close()
 
-    # tempo save
-    dict_save = {
-        'L_M_bin_grain_i_max': L_M_bin_grain_i_max,
-        'L_parameter_test_max': L_parameter_test_max,
-    }
-    with open('seg/tempo_save.dict', 'wb') as handle:
-            pickle.dump(dict_save, handle, protocol=pickle.HIGHEST_PROTOCOL) 
-
     # start to save output of segmentation
     L_rad = []
     L_pos = []
