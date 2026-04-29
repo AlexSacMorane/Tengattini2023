@@ -555,8 +555,8 @@ L_ref_size_6 = []
 for size in L_ref_size_8:
     L_ref_size_6.append(size*6/8)
 L_ref_cum_prob_6 = L_ref_cum_prob_8
-size_min = 0.09e4 # µm2
-size_max = 2.28e4 # µm2
+size_min = 7*6/8 # pixel2
+size_max = 160*6/8 # pixel2
 n_size = 19
 L_size_6 = np.linspace(size_min, size_max, n_size)
 # compute cumulative weight
