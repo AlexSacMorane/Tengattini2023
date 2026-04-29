@@ -75,6 +75,9 @@ name_dict_seg = 'dict_seg_'+str(i_x_min+margin)+'_'+str(i_x_max-2*margin)+'_'\
                            +str(i_y_min+margin)+'_'+str(i_y_max-2*margin)+'_'\
                            +str(i_z_min+margin)+'_'+str(i_z_max-2*margin)+'.dict'
 
+# flag to plot segmentation
+flag_plot_seg = False 
+
 #-------------------------------------------------------------------------------
 #Read data
 #-------------------------------------------------------------------------------
@@ -227,21 +230,22 @@ if not Path('seg/tempo_save.dict').exists():
                 L_NCC_large.append(NCC_i_max)
                 L_radius_large.append(parameter_test_max[0])
                 # plot
-                #fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(16,9), num=1)
-                # labeled
-                #ax1.imshow(M_bin_grain_i[:,:,int(parameter_test_max[3])])
-                #ax2.imshow(M_bin_grain_i[:,int(parameter_test_max[2]),:])
-                #ax3.imshow(M_bin_grain_i[int(parameter_test_max[1]),:,:])
-                # test
-                #ax4.imshow(M_bin_grain_i_max[:,:,int(parameter_test_max[3])])
-                #ax5.imshow(M_bin_grain_i_max[:,int(parameter_test_max[2]),:])
-                #ax6.imshow(M_bin_grain_i_max[int(parameter_test_max[1]),:,:])
-                # close
-                #ax2.set_title('ct-scan')
-                #ax5.set_title('segmentation')
-                #fig.suptitle('NCC='+str(round(NCC_i_max, 2)))
-                #plt.savefig('seg/grain_'+str(i_label)+'.png')
-                #plt.close()
+                if flag_plot_seg:
+                    fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(16,9), num=1)
+                    # labeled
+                    ax1.imshow(M_bin_grain_i[:,:,int(parameter_test_max[3])])
+                    ax2.imshow(M_bin_grain_i[:,int(parameter_test_max[2]),:])
+                    ax3.imshow(M_bin_grain_i[int(parameter_test_max[1]),:,:])
+                    # test
+                    ax4.imshow(M_bin_grain_i_max[:,:,int(parameter_test_max[3])])
+                    ax5.imshow(M_bin_grain_i_max[:,int(parameter_test_max[2]),:])
+                    ax6.imshow(M_bin_grain_i_max[int(parameter_test_max[1]),:,:])
+                    # close
+                    ax2.set_title('ct-scan')
+                    ax5.set_title('segmentation')
+                    fig.suptitle('NCC='+str(round(NCC_i_max, 2)))
+                    plt.savefig('seg/grain_'+str(i_label)+'.png')
+                    plt.close()
 
             # in the margin area
             else:
@@ -366,18 +370,19 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
     for j_grain in range(i_grain+1, len(L_M_bin_grain_i_max)):
         print('couple: ', i_grain, '-', j_grain, '(max ='+str(len(L_M_bin_grain_i_max)-1)+')')
 
-        # plot only (slowdown the code)
-        #M_bin_2grains_cement_plot = np.zeros_like(M_bin_cement, dtype=int)
-        #for i_x in range(0, M_bin_2grains_cement_plot.shape[0]):
-        #    for i_y in range(0, M_bin_2grains_cement_plot.shape[1]):
-        #        for i_z in range(0, M_bin_2grains_cement_plot.shape[2]):
-        #            if M_bin_grain[i_x, i_y, i_z]:
-        #                if L_M_bin_grain_i_max[i_grain][i_x, i_y, i_z] or L_M_bin_grain_i_max[j_grain][i_x, i_y, i_z]:
-        #                    M_bin_2grains_cement_plot[i_x, i_y, i_z] = 1 # grain
-        #                else:
-        #                    M_bin_2grains_cement_plot[i_x, i_y, i_z] = 3 # grain but not in the contact
-        #            if M_bin_cement[i_x, i_y, i_z]:
-        #                M_bin_2grains_cement_plot[i_x, i_y, i_z] = 4 # cement but not in the contact
+        if flag_plot_seg:
+            # plot only (slowdown the code)
+            M_bin_2grains_cement_plot = np.zeros_like(M_bin_cement, dtype=int)
+            for i_x in range(0, M_bin_2grains_cement_plot.shape[0]):
+                for i_y in range(0, M_bin_2grains_cement_plot.shape[1]):
+                    for i_z in range(0, M_bin_2grains_cement_plot.shape[2]):
+                        if M_bin_grain[i_x, i_y, i_z]:
+                            if L_M_bin_grain_i_max[i_grain][i_x, i_y, i_z] or L_M_bin_grain_i_max[j_grain][i_x, i_y, i_z]:
+                                M_bin_2grains_cement_plot[i_x, i_y, i_z] = 1 # grain
+                            else:
+                                M_bin_2grains_cement_plot[i_x, i_y, i_z] = 3 # grain but not in the contact
+                        if M_bin_cement[i_x, i_y, i_z]:
+                            M_bin_2grains_cement_plot[i_x, i_y, i_z] = 4 # cement but not in the contact
         
         # compute the combination of the 2 grains and the cement phase
         M_bin_2grains_cement = M_bin_cement.copy() + L_M_bin_grain_i_max[i_grain].copy() + L_M_bin_grain_i_max[j_grain].copy()
@@ -440,13 +445,14 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                 L_ij_contact.append((i_grain, j_grain))
                 L_L_xyz_contact.append(L_yxz_contact)
                 L_parameter_contact.append([radius_i, radius_j, distance_ij])
-                # plot
-                #fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
-                #ax1.imshow(M_bin_2grains_cement_plot[:, :, int((z_max_box+z_min_box)/2)], cmap='nipy_spectral')
-                #ax2.imshow(M_bin_2grains_cement_plot[:, int((y_max_box+y_min_box)/2), :], cmap='nipy_spectral')
-                #ax3.imshow(M_bin_2grains_cement_plot[int((x_max_box+x_min_box)/2), :, :], cmap='nipy_spectral')
-                #plt.savefig('seg/contact_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
-                #plt.close()
+                if flag_plot_seg:
+                    # plot
+                    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+                    ax1.imshow(M_bin_2grains_cement_plot[:, :, int((z_max_box+z_min_box)/2)], cmap='nipy_spectral')
+                    ax2.imshow(M_bin_2grains_cement_plot[:, int((y_max_box+y_min_box)/2), :], cmap='nipy_spectral')
+                    ax3.imshow(M_bin_2grains_cement_plot[int((x_max_box+x_min_box)/2), :, :], cmap='nipy_spectral')
+                    plt.savefig('seg/contact_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
+                    plt.close()
 
 # plot
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
