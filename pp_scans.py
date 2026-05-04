@@ -37,11 +37,16 @@ def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
     Compute the distribution (and its cumulative) of a list of values.
     '''
     # iterate on the list
+    counter = 0
     for value in L_value:
-        i_pp = 0
-        while not(L_value_pp[i_pp]<=value and value<=L_value_pp[i_pp+1]):
-            i_pp = i_pp + 1
-        L_n_value_pp[i_pp] = L_n_value_pp[i_pp] + 1
+        if L_value_pp[0]<=value and value<=L_value_pp[-1]:
+            i_pp = 0
+            while not(L_value_pp[i_pp]<=value and value<=L_value_pp[i_pp+1]):
+                i_pp = i_pp + 1
+            L_n_value_pp[i_pp] = L_n_value_pp[i_pp] + 1
+        else :
+            counter = counter + 1
+    print('number of values out of the range: ', counter, '/', len(L_value))
     # compute cumulative
     for i in range(len(L_n_value_pp)):
         L_cum_n_value_pp[i] = L_n_value_pp[i]/np.sum(L_n_value_pp)
@@ -281,7 +286,8 @@ if not Path('seg/tempo_save.dict').exists():
     dict_save = {
         'L_M_bin_grain_i_max': L_M_bin_grain_i_max,
         'L_parameter_test_max': L_parameter_test_max,
-        'dict_seg': dict_seg
+        'dict_seg': dict_seg,
+        'M_bin_grain_extract': M_bin_grain_extract
     }
     with open('seg/tempo_save.dict', 'wb') as handle:
             pickle.dump(dict_save, handle, protocol=pickle.HIGHEST_PROTOCOL) 
@@ -293,6 +299,7 @@ else :
     L_M_bin_grain_i_max = dict_save['L_M_bin_grain_i_max']
     L_parameter_test_max = dict_save['L_parameter_test_max']
     dict_seg = dict_save['dict_seg']
+    #M_bin_grain_extract = dict_save['M_bin_grain_extract']
 
 #-------------------------------------------------------------------------------
 #Plot and characterization of the grain segmentation
@@ -336,28 +343,28 @@ plt.savefig('seg/radius_resume.png')
 plt.close()
 
 # rebuild the prediction of the microstructure (grain)
-M_bin_grain_predicted = np.zeros_like(M_bin_grain_extract)
-for M_bin_grain_i_max in L_M_bin_grain_i_max:
-    M_bin_grain_predicted = M_bin_grain_predicted + M_bin_grain_i_max
+#M_bin_grain_predicted = np.zeros_like(M_bin_grain_extract)
+#for M_bin_grain_i_max in L_M_bin_grain_i_max:
+#    M_bin_grain_predicted = M_bin_grain_predicted + M_bin_grain_i_max
 # characterize the segmentation of the grain
-S_12 = 0
-S_11 = 0
-S_22 = 0
-M_prediction_grain = np.ones_like(M_bin_grain_extract)
-for i_x in range(M_bin_grain_extract.shape[0]):
-    for i_y in range(M_bin_grain_extract.shape[1]):
-        for i_z in range(M_bin_grain_extract.shape[2]):
-            # NCC
-            S_12 = S_12 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
-            S_11 = S_11 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_extract[i_x,i_y,i_z]
-            S_22 = S_22 + M_bin_grain_predicted[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
-            # other comparison
-            if M_bin_grain_extract[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
-                M_prediction_grain[i_x, i_y, i_z] = True
-            else : 
-                M_prediction_grain[i_x, i_y, i_z] = False
-print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2)*100, '% well segmented', \
-                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')
+#S_12 = 0
+#S_11 = 0
+#S_22 = 0
+#M_prediction_grain = np.ones_like(M_bin_grain_extract)
+#for i_x in range(M_bin_grain_extract.shape[0]):
+#    for i_y in range(M_bin_grain_extract.shape[1]):
+#        for i_z in range(M_bin_grain_extract.shape[2]):
+#            # NCC
+#            S_12 = S_12 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+#            S_11 = S_11 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_extract[i_x,i_y,i_z]
+#            S_22 = S_22 + M_bin_grain_predicted[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+#            # other comparison
+#            if M_bin_grain_extract[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
+#                 M_prediction_grain[i_x, i_y, i_z] = True
+#            else : 
+#                M_prediction_grain[i_x, i_y, i_z] = False
+#print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2)*100, '% well segmented', \
+#                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')
 
 #-------------------------------------------------------------------------------
 #Segmentation of cement
@@ -372,7 +379,7 @@ M_n_active_cement = np.zeros_like(M_bin_cement, dtype=int)
 # iterate on pair of grains
 for i_grain in range(len(L_M_bin_grain_i_max)-1):
     for j_grain in range(i_grain+1, len(L_M_bin_grain_i_max)):
-        print('couple: ', i_grain, '-', j_grain, '(max ='+str(len(L_M_bin_grain_i_max)-1)+')')
+        print('couple: ', i_grain, '-', j_grain, '(max = '+str(len(L_M_bin_grain_i_max)-1)+')')
 
         if flag_plot_seg:
             # plot only (slowdown the code)
@@ -420,7 +427,7 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
 
                 # iterate in the box of investigation
                 L_yxz_contact = []
-                for i_x in range(x_min_box, x_max_box):
+                '''for i_x in range(x_min_box, x_max_box):
                     for i_y in range(y_min_box, y_max_box):
                         for i_z in range(z_min_box, z_max_box):
                             # check if there is cement
@@ -444,7 +451,7 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                                         M_n_active_cement[i_x, i_y, i_z] = M_n_active_cement[i_x, i_y, i_z] + 1
                                         L_yxz_contact.append((i_x, i_y, i_z))
                                         # for plot only
-                                        #M_bin_2grains_cement_plot[i_x, i_y, i_z] = 2 # cement in the contact
+                                        #M_bin_2grains_cement_plot[i_x, i_y, i_z] = 2 # cement in the contact'''
                 # save
                 L_ij_contact.append((i_grain, j_grain))
                 L_L_xyz_contact.append(L_yxz_contact)
@@ -497,31 +504,52 @@ print('Cement :', round(np.sum(M_prediction_cement)/M_prediction_cement.size, 2)
 #-------------------------------------------------------------------------------
 
 # iterate on  the cement bridge
+L_V_cement = []
 L_S_cement = []
 L_S_cement_weighted = []
+counter_a = 0 
+counter_b = 0 
 # iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
-    # height of cement
-    H_cement = (L_parameter_contact[i_cement][2]-L_parameter_contact[i_cement][0]-L_parameter_contact[i_cement][1]) +\
-                                                       4/3*((-L_parameter_contact[i_cement][0]**3+\
-                                                       2*L_parameter_contact[i_cement][0]**2*L_parameter_contact[i_cement][1]+\
-                                                       2*L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]**2-\
-                                                       L_parameter_contact[i_cement][1]**3)/\
-                                                 (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2)
-    # compute the equivalent volume
+    # compute the volume of the truncated cone
+    V_trunc_cone = 4/3*(L_parameter_contact[i_cement][2]*(L_parameter_contact[i_cement][0]**2+\
+                                                          L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]+\
+                                                          L_parameter_contact[i_cement][1]**2) -\
+                        2*L_parameter_contact[i_cement][0]**3 - 2*L_parameter_contact[i_cement][1]**3)/\
+                    (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2
+    
+    # compute the equivalent volume of the cement
     V_cement = 0
     V_cement_weighted = 0
     for i_xyz in range(len(L_L_xyz_contact[i_cement])):
         V_cement = V_cement+1
         # apply a weight according to the number of participation of the cement in the contacts
         V_cement_weighted = V_cement_weighted+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
-    # compute the equivalent section 
-    L_S_cement.append(V_cement/H_cement)
-    L_S_cement_weighted.append(V_cement_weighted/H_cement)
+    
+    # compute the damage
+    damage = 1 - V_cement/V_trunc_cone
+    damage_weighted = 1 - V_cement_weighted/V_trunc_cone
+
+    # compute the section of the cement bridge
+    S_cement = math.pi*(L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2/4*(1-damage)
+    S_cement_weighted = math.pi*(L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2/4*(1-damage_weighted)
+
+    # save
+    L_V_cement.append(V_cement)
+    L_S_cement.append(S_cement)
+    L_S_cement_weighted.append(S_cement_weighted)
+
+    if V_trunc_cone<0:
+        counter_a = counter_a + 1
+    if damage > 1:
+        counter_b = counter_b + 1
+
+print('(final) negative volume truncated cone : ', counter_a, '/', len(L_L_xyz_contact))
+print('(final) damage larger than 1 : ', counter_b, '/', len(L_L_xyz_contact))
 
 # finish to save the output of the segmentation
-dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
-dict_seg['L_S_cement_weighted_pixel'] = L_S_cement_weighted.copy()
+#dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
+#dict_seg['L_S_cement_weighted_pixel'] = L_S_cement_weighted.copy()
 dict_seg['L_ij_contact'] = L_ij_contact.copy()
 
 # write output of the segmentation 
@@ -530,19 +558,12 @@ with open(name_dict_seg, 'wb') as handle:
 
 # compute the distribution of the cement area
 n_pp = 20
-L_S_cement_pp = np.linspace(min(L_S_cement),max(L_S_cement),n_pp)
-L_S_cement_weighted_pp = np.linspace(min(L_S_cement_weighted),max(L_S_cement_weighted),n_pp)
-L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-
-# convert in µm
-L_S_cement_pp_135 = []
-L_S_cement_pp_148 = []
-L_S_cement_weighted_pp_148 = []
-for i_S_cement_pp in range(len(L_S_cement_pp)):
-    L_S_cement_pp_135.append(L_S_cement_pp[i_S_cement_pp]*pixel_to_um_135*pixel_to_um_135)
-    L_S_cement_pp_148.append(L_S_cement_pp[i_S_cement_pp]*pixel_to_um_148*pixel_to_um_148)
-    L_S_cement_weighted_pp_148.append(L_S_cement_weighted_pp[i_S_cement_pp]*pixel_to_um_148*pixel_to_um_148)
+L_V_cement_pp = np.linspace(0, max(L_V_cement), n_pp)
+#L_S_cement_pp = np.linspace(0, 400, n_pp)
+#L_S_cement_weighted_pp = np.linspace(0, 200, n_pp)
+L_n_V_cement_pp, L_cum_n_V_cement_pp = compute_distribution(L_V_cement, L_V_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+#L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+#L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
 # reference value (8% of cement)
 L_ref_size_8     = [0,    7,   19,   28,   41,   48,   60,   76,  88,  100,   117,  130, 160]
@@ -583,19 +604,26 @@ for size in L_size_6:
 
 # plot
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
-ax1.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label='ct-scan')
 ax1.scatter(L_size_8, L_cum_p_size_8, label='article (8%)', color='k')
 ax1.scatter(L_size_6, L_cum_p_size_6, label='article (6%)', color='gray')
-ax1.set_xlabel('size (pixel^2)')
+ax1.set_xlabel('sectional surface (pixel^2)')
 ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
 plt.savefig('seg/S_cement_resume.png')
 plt.close()
 
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
-ax1.scatter(L_S_cement_weighted_pp_148[:-1], L_cum_n_S_cement_weighted_pp, label='ct-scan (14.8 um/pixel)')
-ax1.set_xlabel('size (um^2)')
+ax1.scatter(L_V_cement_pp[:-1], L_cum_n_V_cement_pp, label='ct-scan')
+ax1.set_xlabel('volume (pixel^3)')
 ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
-plt.savefig('seg/S_cement_weighthed_resume.png')
+plt.savefig('seg/V_cement_resume.png')
 plt.close()
+
+#fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
+#ax1.scatter(L_S_cement_weighted_pp_148[:-1], L_cum_n_S_cement_weighted_pp, label='ct-scan (14.8 um/pixel)')
+#ax1.set_xlabel('size (um^2)')
+#ax1.set_ylabel('cumulative probability (-)')
+#ax1.legend()
+#plt.savefig('seg/S_cement_weighthed_resume.png')
+#plt.close()
