@@ -512,12 +512,22 @@ counter_b = 0
 # iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
     # compute the volume of the truncated cone
-    V_trunc_cone = 4/3*(L_parameter_contact[i_cement][2]*(L_parameter_contact[i_cement][0]**2+\
-                                                          L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]+\
-                                                          L_parameter_contact[i_cement][1]**2) -\
-                        2*L_parameter_contact[i_cement][0]**3 - 2*L_parameter_contact[i_cement][1]**3)/\
-                    (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2
-    
+    #V_trunc_cone = 4/3*(L_parameter_contact[i_cement][2]*(L_parameter_contact[i_cement][0]**2+\
+    #                                                      L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]+\
+    #                                                      L_parameter_contact[i_cement][1]**2) -\
+    #                    2*L_parameter_contact[i_cement][0]**3 - 2*L_parameter_contact[i_cement][1]**3)/\
+    #                (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2
+    #H_eq = L_parameter_contact[i_cement][2] - L_parameter_contact[i_cement][0] - L_parameter_contact[i_cement][1] +\
+    #        4/3*(-L_parameter_contact[i_cement][0]**3 + \
+    #             2*L_parameter_contact[i_cement][0]**2*L_parameter_contact[i_cement][1] + \
+    #             2*L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]**2 - \
+    #             L_parameter_contact[i_cement][1]**3)/\
+    #        (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2
+    H_eq = L_parameter_contact[i_cement][2] - L_parameter_contact[i_cement][0] - L_parameter_contact[i_cement][1] +\
+            1/3*(L_parameter_contact[i_cement][0] + L_parameter_contact[i_cement][1])
+    H_eq = max(0, H_eq) # to avoid negative volume
+    V_trunc_cone = H_eq*math.pi*(L_parameter_contact[i_cement][0]**2+L_parameter_contact[i_cement][1]**2)/2
+
     # compute the equivalent volume of the cement
     V_cement = 0
     V_cement_weighted = 0
@@ -527,11 +537,15 @@ for i_cement in range(len(L_L_xyz_contact)):
         V_cement_weighted = V_cement_weighted+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
     
     # compute the damage
-    damage = 1 - V_cement/V_trunc_cone
-    damage_weighted = 1 - V_cement_weighted/V_trunc_cone
+    if V_trunc_cone > 0:
+        damage = 1 - V_cement/V_trunc_cone
+        damage_weighted = 1 - V_cement_weighted/V_trunc_cone
+    else :
+        damage = 1
+        damage_weighted = 1
 
     # compute the section of the cement bridge
-    S_cement = math.pi*(L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2/4*(1-damage)
+    S_cement = math.pi*(L_parameter_contact[i_cement][0]**2+L_parameter_contact[i_cement][1]**2)/2*(1-damage)
     S_cement_weighted = math.pi*(L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2/4*(1-damage_weighted)
 
     # save
@@ -548,8 +562,8 @@ print('(final) negative volume truncated cone : ', counter_a, '/', len(L_L_xyz_c
 print('(final) damage larger than 1 : ', counter_b, '/', len(L_L_xyz_contact))
 
 # finish to save the output of the segmentation
-#dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
-#dict_seg['L_S_cement_weighted_pixel'] = L_S_cement_weighted.copy()
+dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
+dict_seg['L_S_cement_weighted_pixel'] = L_S_cement_weighted.copy()
 dict_seg['L_ij_contact'] = L_ij_contact.copy()
 
 # write output of the segmentation 
@@ -559,11 +573,11 @@ with open(name_dict_seg, 'wb') as handle:
 # compute the distribution of the cement area
 n_pp = 20
 L_V_cement_pp = np.linspace(0, max(L_V_cement), n_pp)
-#L_S_cement_pp = np.linspace(0, 400, n_pp)
-#L_S_cement_weighted_pp = np.linspace(0, 200, n_pp)
+L_S_cement_pp = np.linspace(0, 200, n_pp)
+L_S_cement_weighted_pp = np.linspace(0, 200, n_pp)
 L_n_V_cement_pp, L_cum_n_V_cement_pp = compute_distribution(L_V_cement, L_V_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-#L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
-#L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
 # reference value (8% of cement)
 L_ref_size_8     = [0,    7,   19,   28,   41,   48,   60,   76,  88,  100,   117,  130, 160]
@@ -606,6 +620,7 @@ for size in L_size_6:
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
 ax1.scatter(L_size_8, L_cum_p_size_8, label='article (8%)', color='k')
 ax1.scatter(L_size_6, L_cum_p_size_6, label='article (6%)', color='gray')
+ax1.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label='ct-scan', color='b')
 ax1.set_xlabel('sectional surface (pixel^2)')
 ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
