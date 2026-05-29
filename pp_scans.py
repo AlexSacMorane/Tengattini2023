@@ -59,16 +59,24 @@ def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
 #-------------------------------------------------------------------------------
 
 # size of sub_REV
-size_subrev = 125
+#size_subrev = 125
 
 # extraction
-margin = 10 # to avoid border effect
-i_x_min = 575-margin #450
-i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
-i_y_min = 600-margin #475
-i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
-i_z_min = 160-margin #150
-i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
+#margin = 10 # to avoid border effect
+#i_x_min = 575-margin #450
+#i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
+#i_y_min = 600-margin #475
+#i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
+#i_z_min = 160-margin #150
+#i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
+i_x_min = 0
+i_x_max = 50
+i_y_min = 0
+i_y_max = 50
+i_z_min = 0
+i_z_max = 120
+margin = 0
+
 
 # conversion pixel to µm
 pixel_to_um_135 = 13.5 # µm/pixel
@@ -76,12 +84,13 @@ pixel_to_um_148 = 14.8 # µm/pixel
 
 # create the segmentation dict
 dict_seg = {}
-name_dict_seg = 'dict_seg_'+str(i_x_min+margin)+'_'+str(i_x_max-2*margin)+'_'\
-                           +str(i_y_min+margin)+'_'+str(i_y_max-2*margin)+'_'\
-                           +str(i_z_min+margin)+'_'+str(i_z_max-2*margin)+'.dict'
+#name_dict_seg = 'dict_seg_'+str(i_x_min+margin)+'_'+str(i_x_max-2*margin)+'_'\
+#                           +str(i_y_min+margin)+'_'+str(i_y_max-2*margin)+'_'\
+#                           +str(i_z_min+margin)+'_'+str(i_z_max-2*margin)+'.dict'
+name_dict_seg = 'test.dict'
 
 # flag to plot segmentation
-flag_plot_seg = False 
+flag_plot_seg = True 
 
 #-------------------------------------------------------------------------------
 #Read data
@@ -93,12 +102,19 @@ M_bin = np.zeros((i_x_max-i_x_min, i_y_max-i_y_min, i_z_max-i_z_min))
 for i_z in range(i_z_max-i_z_min):
     ind = i_z+i_z_min
     # convert in str index
-    if ind < 1000:
+    #if ind < 1000:
+    #    ind_str = '0'+str(ind)
+    #else :
+    #    ind_str = str(ind)
+    if ind < 10:
+        ind_str = '00'+str(ind)
+    elif ind < 100:
         ind_str = '0'+str(ind)
     else :
         ind_str = str(ind)
     # name of the .png file
-    z_section_file = 'Tengattini2023_scans/CGB29AT'+ind_str+'.png'
+    #z_section_file = 'Tengattini2023_scans/CGB29AT'+ind_str+'.png'
+    z_section_file = 'synthetic/scans_'+ind_str+'.png'
 
     # open the image and convert in numpy array
     z_section = np.array(Image.open(z_section_file))
@@ -106,8 +122,22 @@ for i_z in range(i_z_max-i_z_min):
     # define the window of study
     z_section = z_section[i_x_min:i_x_max, i_y_min:i_y_max]
 
+    # convert value
+    for i_x in range(z_section.shape[0]):
+        for i_y in range(z_section.shape[1]):
+            if list(z_section[i_x, i_y]) == [68, 1, 84, 255]:
+                M_bin[i_x, i_y, i_z] = 0
+            elif list(z_section[i_x, i_y]) == [32, 144, 140, 255]:
+                M_bin[i_x, i_y, i_z] = 128
+            elif list(z_section[i_x, i_y]) == [253, 231, 36, 255]:
+                M_bin[i_x, i_y, i_z] = 255
+            else : 
+                print(z_section[i_x, i_y])
+
+             
+
     # add to the matrix
-    M_bin[:, :, i_z] = z_section
+    #M_bin[:, :, i_z] = z_section
 
 #-------------------------------------------------------------------------------
 #Segmentation of grain
@@ -121,16 +151,16 @@ M_bin_grain = M_bin == 255
 # plot
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_bin[:, :, int(M_bin.shape[2]/2)])
-ax2.imshow(M_bin[:, int(M_bin.shape[2]/2), :])
-ax3.imshow(M_bin[int(M_bin.shape[2]/2), :, :])
+ax2.imshow(M_bin[:, int(M_bin.shape[1]/2), :])
+ax3.imshow(M_bin[int(M_bin.shape[0]/2), :, :])
 plt.savefig('seg/ctscan_resume.png')
 plt.close()
 
 # plot
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_bin_cement[:, :, int(M_bin_cement.shape[2]/2)])
-ax2.imshow(M_bin_cement[:, int(M_bin_cement.shape[2]/2), :])
-ax3.imshow(M_bin_cement[int(M_bin_cement.shape[2]/2), :, :])
+ax2.imshow(M_bin_cement[:, int(M_bin_cement.shape[1]/2), :])
+ax3.imshow(M_bin_cement[int(M_bin_cement.shape[0]/2), :, :])
 plt.savefig('seg/cement_resume.png')
 plt.close()
 
@@ -265,8 +295,8 @@ if not Path('seg/tempo_save.dict').exists():
     # plot
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
     ax1.imshow(shuffled_labels[:, :, int(shuffled_labels.shape[2]/2)])
-    ax2.imshow(shuffled_labels[:, int(shuffled_labels.shape[2]/2), :])
-    ax3.imshow(shuffled_labels[int(shuffled_labels.shape[2]/2), :, :])
+    ax2.imshow(shuffled_labels[:, int(shuffled_labels.shape[1]/2), :])
+    ax3.imshow(shuffled_labels[int(shuffled_labels.shape[0]/2), :, :])
     ax4.scatter(L_radius_small, L_NCC_small, color='r', marker='x')
     ax4.scatter(L_radius_large, L_NCC_large, color='g')
     plt.savefig('seg/grain_resume.png')
@@ -276,8 +306,8 @@ if not Path('seg/tempo_save.dict').exists():
     L_rad = []
     L_pos = []
     for i_parameter in range(len(L_parameter_test_max)):
-        L_rad.append(L_parameter_test_max[0])
-        L_pos.append(np.array([L_parameter_test_max[1], L_parameter_test_max[2], L_parameter_test_max[3]]))
+        L_rad.append(L_parameter_test_max[i_parameter][0])
+        L_pos.append(np.array([L_parameter_test_max[i_parameter][1], L_parameter_test_max[i_parameter][2], L_parameter_test_max[i_parameter][3]]))
     dict_seg['L_pos_pixel'] = L_pos.copy()
     dict_seg['L_rad_pixel'] = L_rad.copy()
     dict_seg['L_NCC_grain'] = L_NCC_large.copy()
@@ -468,8 +498,8 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
 # plot
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_n_active_cement[:, :, int(M_n_active_cement.shape[2]/2)])
-ax2.imshow(M_n_active_cement[:, int(M_n_active_cement.shape[2]/2), :])
-ax3.imshow(M_n_active_cement[int(M_n_active_cement.shape[2]/2), :, :])
+ax2.imshow(M_n_active_cement[:, int(M_n_active_cement.shape[1]/2), :])
+ax3.imshow(M_n_active_cement[int(M_n_active_cement.shape[0]/2), :, :])
 # compute histogram of the number of active cement
 hist, bin_edges = np.histogram(M_n_active_cement[M_n_active_cement > 0], bins=np.arange(1, np.max(M_n_active_cement)+1)-0.5)
 ax4.hist(bin_edges[:-1], bin_edges, weights=hist)
@@ -560,6 +590,7 @@ for i_cement in range(len(L_L_xyz_contact)):
 
 print('(final) negative volume truncated cone : ', counter_a, '/', len(L_L_xyz_contact))
 print('(final) damage larger than 1 : ', counter_b, '/', len(L_L_xyz_contact))
+
 
 # finish to save the output of the segmentation
 dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
