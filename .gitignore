@@ -16,4 +16,5 @@ save
 vtk
 scan
 seg*
-synthetic
+synthetic*
+__pycache__
