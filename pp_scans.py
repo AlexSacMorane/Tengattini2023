@@ -339,7 +339,7 @@ else :
     L_M_bin_grain_i_max = dict_save['L_M_bin_grain_i_max']
     L_parameter_test_max = dict_save['L_parameter_test_max']
     dict_seg = dict_save['dict_seg']
-    #M_bin_grain_extract = dict_save['M_bin_grain_extract']
+    M_bin_grain_extract = dict_save['M_bin_grain_extract']
 
 #-------------------------------------------------------------------------------
 #Plot and characterization of the grain segmentation
