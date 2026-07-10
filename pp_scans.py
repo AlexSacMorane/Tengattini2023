@@ -72,7 +72,7 @@ def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
             L_n_value_pp[i_pp] = L_n_value_pp[i_pp] + 1
         else :
             counter = counter + 1
-    print('number of values out of the range: ', counter, '/', len(L_value))
+    #print('number of values out of the range: ', counter, '/', len(L_value))
     # compute cumulative
     for i in range(len(L_n_value_pp)):
         L_cum_n_value_pp[i] = L_n_value_pp[i]/np.sum(L_n_value_pp)
