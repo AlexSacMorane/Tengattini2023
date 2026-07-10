@@ -159,7 +159,7 @@ fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_bin[:, :, int(M_bin.shape[2]/2)])
 ax2.imshow(M_bin[:, int(M_bin.shape[1]/2), :])
 ax3.imshow(M_bin[int(M_bin.shape[0]/2), :, :])
-plt.savefig('seg/ctscan_resume.png')
+plt.savefig(folder_seg+'/ctscan_resume.png')
 plt.close()
 
 # plot
@@ -167,10 +167,10 @@ fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
 ax1.imshow(M_bin_cement[:, :, int(M_bin_cement.shape[2]/2)])
 ax2.imshow(M_bin_cement[:, int(M_bin_cement.shape[1]/2), :])
 ax3.imshow(M_bin_cement[int(M_bin_cement.shape[0]/2), :, :])
-plt.savefig('seg/cement_resume.png')
+plt.savefig(folder_seg+'/cement_resume.png')
 plt.close()
 
-if not Path('seg/tempo_save.dict').exists():
+if not Path(folder_seg+'/tempo_save.dict').exists():
 
     # apply the watersheld algorithm to identify the grains
     print('Apply the watershed')
@@ -291,7 +291,7 @@ if not Path('seg/tempo_save.dict').exists():
                     ax2.set_title('ct-scan')
                     ax5.set_title('segmentation')
                     fig.suptitle('NCC='+str(round(NCC_i_max, 2)))
-                    plt.savefig('seg/grain_'+str(i_label)+'.png')
+                    plt.savefig(folder_seg+'/grain_'+str(i_label)+'.png')
                     plt.close()
 
             # in the margin area
@@ -305,7 +305,9 @@ if not Path('seg/tempo_save.dict').exists():
     ax3.imshow(shuffled_labels[int(shuffled_labels.shape[0]/2), :, :])
     ax4.scatter(L_radius_small, L_NCC_small, color='r', marker='x')
     ax4.scatter(L_radius_large, L_NCC_large, color='g')
-    plt.savefig('seg/grain_resume.png')
+    ax4.set_xlabel('radius (pixel)')
+    ax4.set_ylabel('NCC (-)')
+    plt.savefig(folder_seg+'/grain_resume.png')
     plt.close()
 
     # start to save output of segmentation
@@ -325,12 +327,12 @@ if not Path('seg/tempo_save.dict').exists():
         'dict_seg': dict_seg,
         'M_bin_grain_extract': M_bin_grain_extract
     }
-    with open('seg/tempo_save.dict', 'wb') as handle:
+    with open(folder_seg+'/tempo_save.dict', 'wb') as handle:
             pickle.dump(dict_save, handle, protocol=pickle.HIGHEST_PROTOCOL) 
 
 else :
     # load save
-    with open('seg/tempo_save.dict', 'rb') as handle:
+    with open(folder_seg+'/tempo_save.dict', 'rb') as handle:
             dict_save = pickle.load(handle)
     L_M_bin_grain_i_max = dict_save['L_M_bin_grain_i_max']
     L_parameter_test_max = dict_save['L_parameter_test_max']
@@ -375,7 +377,7 @@ ax1.plot(L_radius_theoretical, L_cum_n_radius_pp_theoretical, label='dem')
 ax1.plot([275/2, 275/2], [0, 1], label='d50 article', color='k') 
 ax1.plot([275/2*0.9, 275/2*1.1], [0.5, 0.5], color='k') 
 ax1.legend()
-plt.savefig('seg/radius_resume.png')
+plt.savefig(folder_seg+'/radius_pixel_resume.png')
 plt.close()
 
 # rebuild the prediction of the microstructure (grain)
@@ -498,7 +500,7 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
                     ax1.imshow(M_bin_2grains_cement_plot[:, :, int((z_max_box+z_min_box)/2)], cmap='nipy_spectral')
                     ax2.imshow(M_bin_2grains_cement_plot[:, int((y_max_box+y_min_box)/2), :], cmap='nipy_spectral')
                     ax3.imshow(M_bin_2grains_cement_plot[int((x_max_box+x_min_box)/2), :, :], cmap='nipy_spectral')
-                    plt.savefig('seg/contact_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
+                    plt.savefig(folder_seg+'/contact_'+str(i_grain)+'_'+str(j_grain)+'_resume.png')
                     plt.close()
 
 # plot
@@ -509,7 +511,7 @@ ax3.imshow(M_n_active_cement[int(M_n_active_cement.shape[0]/2), :, :])
 # compute histogram of the number of active cement
 hist, bin_edges = np.histogram(M_n_active_cement[M_n_active_cement > 0], bins=np.arange(1, np.max(M_n_active_cement)+1)-0.5)
 ax4.hist(bin_edges[:-1], bin_edges, weights=hist)
-plt.savefig('seg/cement_n_active_resume.png')
+plt.savefig(folder_seg+'/cement_n_active_resume.png')
 plt.close()
 
 # characterize the segmentation of the cement
@@ -661,7 +663,7 @@ ax1.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label='ct-scan', color='b')
 ax1.set_xlabel('sectional surface (pixel^2)')
 ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
-plt.savefig('seg/S_cement_resume.png')
+plt.savefig(folder_seg+'/S_cement_resume.png')
 plt.close()
 
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
@@ -669,7 +671,15 @@ ax1.scatter(L_V_cement_pp[:-1], L_cum_n_V_cement_pp, label='ct-scan')
 ax1.set_xlabel('volume (pixel^3)')
 ax1.set_ylabel('cumulative probability (-)')
 ax1.legend()
-plt.savefig('seg/V_cement_resume.png')
+plt.savefig(folder_seg+'/V_cement_resume.png')
+plt.close()
+
+fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
+ax1.scatter(L_S_cement_weighted_pp[:-1], L_cum_n_S_cement_weighted_pp, label='ct-scan')
+ax1.set_xlabel('sectional surface (pixel^2)')
+ax1.set_ylabel('cumulative probability (-)')
+ax1.legend()
+plt.savefig(folder_seg+'/S_cement_weighthed_resume.png')
 plt.close()
 
 #fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
