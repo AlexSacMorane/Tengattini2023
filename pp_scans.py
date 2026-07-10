@@ -19,12 +19,38 @@ def NCC(M1, M2, center, radius):
     '''
     Compute the normalized cross correlation coefficient between two numpy arrays.
     '''
+    # determine the box of investigation
+    i_x_min = max(0, int(center[0]-radius))
+    i_x_max = min(M_bin_grain_i_test.shape[0]-1, int(center[0]+radius))
+    i_y_min = max(0, int(center[1]-radius))
+    i_y_max = min(M_bin_grain_i_test.shape[1]-1, int(center[1]+radius))
+    i_z_min = max(0, int(center[2]-radius))
+    i_z_max = min(M_bin_grain_i_test.shape[2]-1, int(center[2]+radius))
+    # try to increase in the -x direction
+    while 0 < i_x_min and np.sum(M1[i_x_min,:,:])>0 and np.sum(M2[i_x_min,:,:])>0:
+        i_x_min = i_x_min - 1
+    # try to increase in the +x direction
+    while i_x_max < M_bin_grain_i_test.shape[0]-2 and np.sum(M1[i_x_max,:,:])>0 and np.sum(M2[i_x_max,:,:])>0:
+        i_x_max = i_x_max + 1
+    # try to increase in the -y direction
+    while 0 < i_y_min and np.sum(M1[:,i_y_min,:])>0 and np.sum(M2[:,i_y_min,:])>0:
+        i_y_min = i_y_min - 1
+    # try to increase in the +y direction
+    while i_y_max < M_bin_grain_i_test.shape[1]-2 and np.sum(M1[:,i_y_max,:])>0 and np.sum(M2[:,i_y_max,:])>0:
+        i_y_max = i_y_max + 1
+    # try to increase in the -z direction
+    while 0 < i_z_min and np.sum(M1[:,:,i_z_min])>0 and np.sum(M2[:,:,i_z_min])>0:
+        i_z_min = i_z_min - 1
+    # try to increase in the +z direction
+    while i_z_max < M_bin_grain_i_test.shape[2]-2 and np.sum(M1[:,:,i_z_max])>0 and np.sum(M2[:,:,i_z_max])>0:
+        i_z_max = i_z_max + 1
+    # compute NCC
     S_12 = 0
     S_11 = 0
     S_22 = 0
-    for i in range(max(0, int(center[0]-1.2*radius)), min(M_bin_grain_i_test.shape[0], int(center[0]+1.2*radius))):
-        for j in range(max(0, int(center[1]-1.2*radius)), min(M_bin_grain_i_test.shape[1], int(center[1]+1.2*radius))):
-            for k in range(max(0, int(center[2]-1.2*radius)), min(M_bin_grain_i_test.shape[2], int(center[2]+1.2*radius))):
+    for i in range(i_x_min, i_x_max+1):
+        for j in range(i_y_min, i_y_max+1):
+            for k in range(i_z_min, i_z_max+1):
                 S_12 = S_12 + M1[i,j,k] * M2[i,j,k]
                 S_11 = S_11 + M1[i,j,k] * M1[i,j,k]
                 S_22 = S_22 + M2[i,j,k] * M2[i,j,k]
