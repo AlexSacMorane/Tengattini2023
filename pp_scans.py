@@ -572,22 +572,6 @@ L_S_cement = []
 L_S_cement_weighted = []
 # iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
-    # compute the volume of the truncated cone
-    #V_trunc_cone = 4/3*(L_parameter_contact[i_cement][2]*(L_parameter_contact[i_cement][0]**2+\
-    #                                                      L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]+\
-    #                                                      L_parameter_contact[i_cement][1]**2) -\
-    #                    2*L_parameter_contact[i_cement][0]**3 - 2*L_parameter_contact[i_cement][1]**3)/\
-    #                (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2
-    #H_eq = L_parameter_contact[i_cement][2] - L_parameter_contact[i_cement][0] - L_parameter_contact[i_cement][1] +\
-    #        4/3*(-L_parameter_contact[i_cement][0]**3 + \
-    #             2*L_parameter_contact[i_cement][0]**2*L_parameter_contact[i_cement][1] + \
-    #             2*L_parameter_contact[i_cement][0]*L_parameter_contact[i_cement][1]**2 - \
-    #             L_parameter_contact[i_cement][1]**3)/\
-    #        (L_parameter_contact[i_cement][0]+L_parameter_contact[i_cement][1])**2
-    H_eq = L_parameter_contact[i_cement][2] - L_parameter_contact[i_cement][0] - L_parameter_contact[i_cement][1] +\
-            1/3*(L_parameter_contact[i_cement][0] + L_parameter_contact[i_cement][1])
-    H_eq = max(0, H_eq) # to avoid negative volume
-    V_trunc_cone = H_eq*math.pi*(L_parameter_contact[i_cement][0]**2+L_parameter_contact[i_cement][1]**2)/2
 
     # compute the equivalent volume of the cement
     V_cement = 0
@@ -598,12 +582,8 @@ for i_cement in range(len(L_L_xyz_contact)):
         V_cement_weighted = V_cement_weighted+1/M_n_active_cement[L_L_xyz_contact[i_cement][i_xyz][0], L_L_xyz_contact[i_cement][i_xyz][1], L_L_xyz_contact[i_cement][i_xyz][2]]
     
     # compute the damage
-    if V_trunc_cone > 0:
-        damage = 1 - V_cement/V_trunc_cone
-        damage_weighted = 1 - V_cement_weighted/V_trunc_cone
-    else :
-        damage = 1
-        damage_weighted = 1
+    damage = 1 - V_cement/L_V_trunc_cone_contact[i_cement]
+    damage_weighted = 1 - V_cement_weighted/L_V_trunc_cone_contact[i_cement]
 
     # compute the section of the cement bridge
     S_cement = math.pi*(L_parameter_contact[i_cement][0]**2+L_parameter_contact[i_cement][1]**2)/2*(1-damage)
