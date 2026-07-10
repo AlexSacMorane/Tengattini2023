@@ -9,7 +9,7 @@ from PIL import Image
 from skimage.segmentation import watershed
 from skimage.feature import peak_local_max
 from pathlib import Path
-import math, pickle
+import math, pickle, os, shutil
 
 #-------------------------------------------------------------------------------
 #Function
