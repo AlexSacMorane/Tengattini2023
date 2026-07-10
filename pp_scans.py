@@ -219,9 +219,9 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
             print('pass')
             # generate a approximation of the sphere
             M_bin_grain_i_test = np.zeros_like(M_bin_grain_i)
-            for i_x in range(max(0, int(center[0]-1.2*radius)), min(M_bin_grain_i_test.shape[0], int(center[0]+1.2*radius))):
-                for i_y in range(max(0, int(center[1]-1.2*radius)), min(M_bin_grain_i_test.shape[1], int(center[1]+1.2*radius))):
-                    for i_z in range(max(0, int(center[2]-1.2*radius)), min(M_bin_grain_i_test.shape[2], int(center[2]+1.2*radius))):
+            for i_x in range(max(0, int(center[0]-1.2*radius)), min(M_bin_grain_i_test.shape[0], int(center[0]+1.2*radius+1))):
+                for i_y in range(max(0, int(center[1]-1.2*radius)), min(M_bin_grain_i_test.shape[1], int(center[1]+1.2*radius+1))):
+                    for i_z in range(max(0, int(center[2]-1.2*radius)), min(M_bin_grain_i_test.shape[2], int(center[2]+1.2*radius+1))):
                         distance = ((center[0]-i_x)**2 + (center[1]-i_y)**2 + (center[2]-i_z)**2)**(1/2)
                         if distance <= radius:
                             M_bin_grain_i_test[i_x, i_y, i_z]=1
