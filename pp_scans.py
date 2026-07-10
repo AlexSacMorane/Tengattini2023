@@ -607,7 +607,7 @@ with open(name_dict_seg, 'wb') as handle:
 n_pp = 20
 L_V_cement_pp = np.linspace(0, max(L_V_cement), n_pp)
 L_S_cement_pp = np.linspace(0, 200, n_pp)
-L_S_cement_weighted_pp = np.linspace(0, 200, n_pp)
+L_S_cement_weighted_pp = np.linspace(0, max(L_S_cement_weighted), n_pp)
 L_n_V_cement_pp, L_cum_n_V_cement_pp = compute_distribution(L_V_cement, L_V_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(L_S_cement, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(L_S_cement_weighted, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
