@@ -249,12 +249,13 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
                         for center_z_test in L_center_z_test:
                             # generate a approximation of the sphere
                             M_bin_grain_i_test = np.zeros_like(M_bin_grain_i)
-                            for i_x in range(max(0, int(center_x_test-1.5*radius_test)), min(M_bin_grain_i_test.shape[0], int(center_x_test+1.5*radius_test)+1)):
-                                for i_y in range(max(0, int(center_y_test-1.5*radius_test)), min(M_bin_grain_i_test.shape[1], int(center_y_test+1.5*radius_test)+1)):
-                                    for i_z in range(max(0, int(center_z_test-1.5*radius_test)), min(M_bin_grain_i_test.shape[2], int(center_z_test+1.5*radius_test)+1)):
+                            for i_x in range(max(0, int(center_x_test-radius_test)), min(M_bin_grain_i_test.shape[0], int(center_x_test+radius_test)+1+1)):
+                                for i_y in range(max(0, int(center_y_test-radius_test)), min(M_bin_grain_i_test.shape[1], int(center_y_test+radius_test)+1+1)):
+                                    for i_z in range(max(0, int(center_z_test-radius_test)), min(M_bin_grain_i_test.shape[2], int(center_z_test+radius_test)+1+1)):
                                         distance = ((center_x_test-i_x)**2 + (center_y_test-i_y)**2 + (center_z_test-i_z)**2)**(1/2)
                                         if distance <= radius_test:
                                             M_bin_grain_i_test[i_x, i_y, i_z]=1
+                            
                             # compute the NCC
                             NCC_i = NCC(M_bin_grain_i, M_bin_grain_i_test, [center_x_test, center_y_test, center_z_test], radius_test)
                             if not math.isnan(NCC_i):
