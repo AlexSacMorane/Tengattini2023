@@ -15,6 +15,7 @@ plot
 save
 vtk
 scan
+pp
 seg*
 synthetic*
 __pycache__
