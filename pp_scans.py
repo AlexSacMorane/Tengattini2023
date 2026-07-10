@@ -104,10 +104,14 @@ pixel_to_um_148 = 14.8 # µm/pixel
 
 # create the segmentation dict
 dict_seg = {}
-#name_dict_seg = 'dict_seg_'+str(i_x_min+margin)+'_'+str(i_x_max-2*margin)+'_'\
-#                           +str(i_y_min+margin)+'_'+str(i_y_max-2*margin)+'_'\
-#                           +str(i_z_min+margin)+'_'+str(i_z_max-2*margin)+'.dict'
-name_dict_seg = 'test.dict'
+name_dict_seg = 'dict_seg_'+str(i_x_min+margin)+'_'+str(i_x_max-margin)+'_'\
+                           +str(i_y_min+margin)+'_'+str(i_y_max-margin)+'_'\
+                           +str(i_z_min+margin)+'_'+str(i_z_max-margin)+'.dict'
+# create the segmentation folder
+folder_seg = 'seg_'+str(i_x_min+margin)+'_'+str(i_x_max-margin)+'_'\
+                   +str(i_y_min+margin)+'_'+str(i_y_max-margin)+'_'\
+                   +str(i_z_min+margin)+'_'+str(i_z_max-margin)
+os.makedirs(folder_seg, exist_ok=True)
 
 # flag to plot segmentation
 flag_plot_seg = True 
@@ -121,43 +125,25 @@ M_bin = np.zeros((i_x_max-i_x_min, i_y_max-i_y_min, i_z_max-i_z_min))
 
 for i_z in range(i_z_max-i_z_min):
     ind = i_z+i_z_min
-    # convert in str index
-    #if ind < 1000:
-    #    ind_str = '0'+str(ind)
-    #else :
-    #    ind_str = str(ind)
     if ind < 10:
-        ind_str = '00'+str(ind)
+        ind_str = '000'+str(ind)
     elif ind < 100:
+        ind_str = '00'+str(ind)
+    elif ind < 1000:
         ind_str = '0'+str(ind)
     else :
         ind_str = str(ind)
     # name of the .png file
-    #z_section_file = 'Tengattini2023_scans/CGB29AT'+ind_str+'.png'
-    z_section_file = 'synthetic/scans_'+ind_str+'.png'
-
+    z_section_file = 'Tengattini2023_scans/CGB29AT'+ind_str+'.png'
+    
     # open the image and convert in numpy array
     z_section = np.array(Image.open(z_section_file))
 
     # define the window of study
-    z_section = z_section[i_x_min:i_x_max, i_y_min:i_y_max]
-
-    # convert value
-    for i_x in range(z_section.shape[0]):
-        for i_y in range(z_section.shape[1]):
-            if list(z_section[i_x, i_y]) == [68, 1, 84, 255]:
-                M_bin[i_x, i_y, i_z] = 0
-            elif list(z_section[i_x, i_y]) == [32, 144, 140, 255]:
-                M_bin[i_x, i_y, i_z] = 128
-            elif list(z_section[i_x, i_y]) == [253, 231, 36, 255]:
-                M_bin[i_x, i_y, i_z] = 255
-            else : 
-                print(z_section[i_x, i_y])
-
-             
+    z_section = z_section[i_x_min:i_x_max, i_y_min:i_y_max] 
 
     # add to the matrix
-    #M_bin[:, :, i_z] = z_section
+    M_bin[:, :, i_z] = z_section
 
 #-------------------------------------------------------------------------------
 #Segmentation of grain
