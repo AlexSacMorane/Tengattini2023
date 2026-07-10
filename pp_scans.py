@@ -320,7 +320,7 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
         L_pos.append(np.array([L_parameter_test_max[i_parameter][1], L_parameter_test_max[i_parameter][2], L_parameter_test_max[i_parameter][3]]))
     dict_seg['L_pos_pixel'] = L_pos.copy()
     dict_seg['L_rad_pixel'] = L_rad.copy()
-    dict_seg['L_NCC_grain'] = L_NCC_large.copy()
+    #dict_seg['L_NCC_grain'] = L_NCC_large.copy()
 
     # tempo save
     dict_save = {
