@@ -652,7 +652,7 @@ for size in L_size_6:
 # plot
 fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
 ax1.scatter(L_size_8, L_cum_p_size_8, label='article (8%)', color='k')
-ax1.scatter(L_size_6, L_cum_p_size_6, label='article (6%)', color='gray')
+ax1.scatter(L_size_6, L_cum_p_size_6, label='article (6% pp)', color='gray')
 ax1.scatter(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label='ct-scan', color='b')
 ax1.set_xlabel('sectional surface (pixel^2)')
 ax1.set_ylabel('cumulative probability (-)')
