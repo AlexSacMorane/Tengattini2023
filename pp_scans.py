@@ -430,6 +430,7 @@ print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2)*10
 # determine contact with cement
 print('Segmentate the cement')
 L_ij_contact = []
+L_V_trunc_cone_contact = []
 L_L_xyz_contact = []
 L_parameter_contact = []
 M_n_active_cement = np.zeros_like(M_bin_cement, dtype=int)
@@ -484,32 +485,37 @@ for i_grain in range(len(L_M_bin_grain_i_max)-1):
 
                 # iterate in the box of investigation
                 L_yxz_contact = []
-                '''for i_x in range(x_min_box, x_max_box):
+                V_trunc_cone = 0
+                for i_x in range(x_min_box, x_max_box):
                     for i_y in range(y_min_box, y_max_box):
-                        for i_z in range(z_min_box, z_max_box):
-                            # check if there is cement
-                            if M_bin_cement[i_x, i_y, i_z]:   
-                                # project the point on the segment C_i->C_j
-                                point = np.array([i_x , i_y, i_z])
-                                vector_ipoint = point-center_i
-                                distance_projected_point = np.dot(vector_ipoint, vector_ij)
-                                # determine if the cement is located between the centers
-                                if 0 < distance_projected_point and distance_projected_point < distance_ij:
-                                    # compute the position of the projected point
-                                    projectedpoint = center_i + distance_projected_point*vector_ij
-                                    # determine the distance between the projected point and the point
-                                    vector_projectedpointpoint = point - projectedpoint
-                                    distance_point = np.linalg.norm(vector_projectedpointpoint)
-                                    
-                                    # interpolate the radius of the truncated cylinder
-                                    radius_cylinder = (1-distance_projected_point/distance_ij)*radius_i + distance_projected_point/distance_ij*radius_j
-                                    # determine if the cement is located in the truncated cylinder
-                                    if distance_point <= radius_cylinder:
+                        for i_z in range(z_min_box, z_max_box):    
+                            # project the point on the segment C_i->C_j
+                            point = np.array([i_x , i_y, i_z])
+                            vector_ipoint = point-center_i
+                            distance_projected_point = np.dot(vector_ipoint, vector_ij)
+                            # determine if the point is located between the centers
+                            if 0 < distance_projected_point and distance_projected_point < distance_ij:
+                                # compute the position of the projected point
+                                projectedpoint = center_i + distance_projected_point*vector_ij
+                                # determine the distance between the projected point and the point
+                                vector_projectedpointpoint = point - projectedpoint
+                                distance_point = np.linalg.norm(vector_projectedpointpoint)
+                                
+                                # interpolate the radius of the truncated cylinder
+                                radius_cylinder = (1-distance_projected_point/distance_ij)*radius_i + distance_projected_point/distance_ij*radius_j
+                                # determine if the point is located in the truncated cylinder
+                                if distance_point <= radius_cylinder:
+                                    V_trunc_cone = V_trunc_cone + 1
+                                    # check if there is cement
+                                    if M_bin_cement[i_x, i_y, i_z]:   
                                         M_n_active_cement[i_x, i_y, i_z] = M_n_active_cement[i_x, i_y, i_z] + 1
                                         L_yxz_contact.append((i_x, i_y, i_z))
-                                        # for plot only
-                                        #M_bin_2grains_cement_plot[i_x, i_y, i_z] = 2 # cement in the contact'''
+                                        if flag_plot_seg:
+                                            # for plot only
+                                            M_bin_2grains_cement_plot[i_x, i_y, i_z] = 2 # cement in the contact
+
                 # save
+                L_V_trunc_cone_contact.append(V_trunc_cone)
                 L_ij_contact.append((i_grain, j_grain))
                 L_L_xyz_contact.append(L_yxz_contact)
                 L_parameter_contact.append([radius_i, radius_j, distance_ij])
