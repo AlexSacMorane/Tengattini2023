@@ -346,12 +346,19 @@ else :
 #-------------------------------------------------------------------------------
 
 # extract the radius
+L_radius = []
 L_radius_135 = []
 L_radius_148 = []
-# convert in µm
 for parameter in L_parameter_test_max:
+    L_radius.append(parameter[0])
+    # convert in µm
     L_radius_135.append(parameter[0]*pixel_to_um_135)
     L_radius_148.append(parameter[0]*pixel_to_um_148)
+
+# compute the distribution of the radius
+n_pp = 20
+L_radius_pp = np.linspace(min(L_radius), max(L_radius), n_pp)
+L_n_radius_pp, L_cum_n_radius_pp = compute_distribution(L_radius, L_radius_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
 
 # compute the distribution of the radius
 n_pp = 20
