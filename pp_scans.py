@@ -114,7 +114,7 @@ folder_seg = 'seg_'+str(i_x_min+margin)+'_'+str(i_x_max-margin)+'_'\
 os.makedirs(folder_seg, exist_ok=True)
 
 # flag to plot segmentation
-flag_plot_seg = True 
+flag_plot_seg = False 
 
 #-------------------------------------------------------------------------------
 #Read data
