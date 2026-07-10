@@ -570,8 +570,6 @@ print('Cement :', round(np.sum(M_prediction_cement)/M_prediction_cement.size, 2)
 L_V_cement = []
 L_S_cement = []
 L_S_cement_weighted = []
-counter_a = 0 
-counter_b = 0 
 # iterate on the cement bridges
 for i_cement in range(len(L_L_xyz_contact)):
     # compute the volume of the truncated cone
@@ -615,15 +613,6 @@ for i_cement in range(len(L_L_xyz_contact)):
     L_V_cement.append(V_cement)
     L_S_cement.append(S_cement)
     L_S_cement_weighted.append(S_cement_weighted)
-
-    if V_trunc_cone<0:
-        counter_a = counter_a + 1
-    if damage > 1:
-        counter_b = counter_b + 1
-
-print('(final) negative volume truncated cone : ', counter_a, '/', len(L_L_xyz_contact))
-print('(final) damage larger than 1 : ', counter_b, '/', len(L_L_xyz_contact))
-
 
 # finish to save the output of the segmentation
 dict_seg['L_S_cement_pixel'] = L_S_cement.copy()
