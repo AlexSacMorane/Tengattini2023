@@ -400,28 +400,28 @@ plt.savefig(folder_seg+'/radius_pixel_resume.png')
 plt.close()
 
 # rebuild the prediction of the microstructure (grain)
-#M_bin_grain_predicted = np.zeros_like(M_bin_grain_extract)
-#for M_bin_grain_i_max in L_M_bin_grain_i_max:
-#    M_bin_grain_predicted = M_bin_grain_predicted + M_bin_grain_i_max
+M_bin_grain_predicted = np.zeros_like(M_bin_grain_extract)
+for M_bin_grain_i_max in L_M_bin_grain_i_max:
+    M_bin_grain_predicted = M_bin_grain_predicted + M_bin_grain_i_max
 # characterize the segmentation of the grain
-#S_12 = 0
-#S_11 = 0
-#S_22 = 0
-#M_prediction_grain = np.ones_like(M_bin_grain_extract)
-#for i_x in range(M_bin_grain_extract.shape[0]):
-#    for i_y in range(M_bin_grain_extract.shape[1]):
-#        for i_z in range(M_bin_grain_extract.shape[2]):
-#            # NCC
-#            S_12 = S_12 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
-#            S_11 = S_11 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_extract[i_x,i_y,i_z]
-#            S_22 = S_22 + M_bin_grain_predicted[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
-#            # other comparison
-#            if M_bin_grain_extract[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
-#                 M_prediction_grain[i_x, i_y, i_z] = True
-#            else : 
-#                M_prediction_grain[i_x, i_y, i_z] = False
-#print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2)*100, '% well segmented', \
-#                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')
+S_12 = 0
+S_11 = 0
+S_22 = 0
+M_prediction_grain = np.ones_like(M_bin_grain_extract)
+for i_x in range(M_bin_grain_extract.shape[0]):
+    for i_y in range(M_bin_grain_extract.shape[1]):
+        for i_z in range(M_bin_grain_extract.shape[2]):
+            # NCC
+            S_12 = S_12 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+            S_11 = S_11 + M_bin_grain_extract[i_x,i_y,i_z] * M_bin_grain_extract[i_x,i_y,i_z]
+            S_22 = S_22 + M_bin_grain_predicted[i_x,i_y,i_z] * M_bin_grain_predicted[i_x,i_y,i_z]
+            # other comparison
+            if M_bin_grain_extract[i_x, i_y, i_z] == M_bin_grain_predicted[i_x, i_y, i_z]:
+                 M_prediction_grain[i_x, i_y, i_z] = True
+            else : 
+                M_prediction_grain[i_x, i_y, i_z] = False
+print('Grain :', round(np.sum(M_prediction_grain)/M_prediction_grain.size, 2)*100, '% well segmented', \
+                 round(S_12/(S_11*S_22)**(1/2),2), 'for NCC')
 
 #-------------------------------------------------------------------------------
 #Segmentation of cement
