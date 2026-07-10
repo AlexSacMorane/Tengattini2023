@@ -235,11 +235,12 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
             print('fit')
             # try to find a better fit 
             NCC_i_max = 0 
-            L_radius_test = np.arange(radius-2, radius+2.1, 1)
-            L_center_x_test = np.arange(center[0]-2, center[0]+2.1, 1)
-            L_center_y_test = np.arange(center[1]-2, center[1]+2.1, 1)
-            L_center_z_test = np.arange(center[2]-2, center[2]+2.1, 1)
+            L_radius_test = np.arange(radius-1.5, radius+1.6, 0.5)
+            L_center_x_test = np.arange(center[0]-1.5, center[0]+1.6, 0.5)
+            L_center_y_test = np.arange(center[1]-1.5, center[1]+1.6, 0.5)
+            L_center_z_test = np.arange(center[2]-1.5, center[2]+1.6, 0.5)
             parameter_test_max = (L_radius_test[0], L_center_x_test[0], L_center_y_test[1], L_center_z_test[2])
+
             # introduce perturbation in the radius
             for radius_test in L_radius_test:
                 # and in the position of the center
