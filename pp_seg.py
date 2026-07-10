@@ -68,6 +68,14 @@ fig_wbsd, ax1_wbsd = plt.subplots(1,1,figsize=(16,9))
 # plot PSD
 fig_psd, ax1_psd = plt.subplots(1,1,figsize=(16,9))
 
+# name the vtk files
+vtk_name = open('pp/grains_all.vtk', 'w')
+vtk_name.write('''# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\n''')
+vtk_name.close()
+# prepare the data 
+L_pos_all = []
+L_rad_all = []
+
 #-------------------------------------------------------------------------------
 #Read data
 #-------------------------------------------------------------------------------
@@ -100,6 +108,43 @@ for seg in L_seg:
     # plot PSD
     ax1_psd.plot(L_radius_pp[:-1], L_cum_n_radius_pp, label=seg_name)
 
+    # write the data into a vtk
+    vtk_i_name = open('pp/grains_'+seg_name+'.vtk', 'w')
+    vtk_i_name.write('# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\n')
+    vtk_i_name.write('POINTS '+str(len(dict_seg['L_pos_pixel']))+' double\n')
+    for i_pos in range(len(dict_seg['L_pos_pixel'])):
+        vtk_i_name.write(str(dict_seg['L_pos_pixel'][i_pos][0])+ ' ' +\
+                       str(dict_seg['L_pos_pixel'][i_pos][1])+ ' ' +\
+                       str(dict_seg['L_pos_pixel'][i_pos][2])+ '\n')
+    vtk_i_name.write('\nPOINT_DATA '+str(len(dict_seg['L_pos_pixel']))+'\n')
+    vtk_i_name.write('SCALARS radius double 1\nLOOKUP_TABLE default\n')
+    for i_rad in range(len(dict_seg['L_rad_pixel'])):
+        vtk_i_name.write(str(dict_seg['L_rad_pixel'][i_rad])+ '\n')
+    vtk_i_name.close()
+
+    # find the limits of the domains
+    coord = ''
+    L_coord = []
+    for c in seg[9:-5]:
+        # read
+        if c == '_':
+            L_coord.append(int(coord))
+            coord = ''
+        # save the reading
+        elif c != '_':
+            coord = coord + c
+    L_coord.append(int(coord))
+    # extract i_x_min, i_y_min, i_z_min
+    i_x_min = L_coord[0]
+    i_y_min = L_coord[2]
+    i_z_min = L_coord[4]
+
+    # pp and save the data
+    for i_pos in range(len(dict_seg['L_pos_pixel'])):
+        L_pos_all.append([dict_seg['L_pos_pixel'][i_pos][0]+i_x_min,
+                          dict_seg['L_pos_pixel'][i_pos][1]+i_y_min,
+                          dict_seg['L_pos_pixel'][i_pos][2]+i_z_min])
+        L_rad_all.append(dict_seg['L_rad_pixel'][i_pos])
 
 #-------------------------------------------------------------------------------
 #Close plot
@@ -128,3 +173,19 @@ ax1_psd.legend()
 fig_psd.tight_layout()
 fig_psd.savefig('pp/particle_size_distribution.png')
 plt.close()
+
+#-------------------------------------------------------------------------------
+#write the vtk
+#-------------------------------------------------------------------------------
+
+vtk_name = open('pp/grains_all.vtk', 'a')
+vtk_name.write('POINTS '+str(len(L_pos_all))+' double\n')
+for i_pos in range(len(L_pos_all)):
+    vtk_name.write(str(L_pos_all[i_pos][0])+ ' ' +\
+                    str(L_pos_all[i_pos][1])+ ' ' +\
+                    str(L_pos_all[i_pos][2])+ '\n')
+vtk_name.write('\nPOINT_DATA '+str(len(L_rad_all))+'\n')
+vtk_name.write('SCALARS radius double 1\nLOOKUP_TABLE default\n')
+for i_rad in range(len(L_rad_all)):
+    vtk_name.write(str(L_rad_all[i_rad])+ '\n')
+vtk_name.close()
