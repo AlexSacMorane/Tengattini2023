@@ -9,6 +9,9 @@ Histogram_CSD_ALL_INITIAL_TER_Cum_damage_6.pdf
 # Folders with the scans
 Tengattini2023_scans
 
+# copies of the files
+pp_scans_*
+
 # Folders created during the simulation
 data
 plot
