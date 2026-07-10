@@ -84,25 +84,19 @@ def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
 #User
 #-------------------------------------------------------------------------------
 
+# margin
+margin = 10
+
 # size of sub_REV
-#size_subrev = 125
+size_subrev = 125
 
 # extraction
-#margin = 10 # to avoid border effect
-#i_x_min = 575-margin #450
-#i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
-#i_y_min = 600-margin #475
-#i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
-#i_z_min = 160-margin #150
-#i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
-i_x_min = 0
-i_x_max = 50
-i_y_min = 0
-i_y_max = 50
-i_z_min = 0
-i_z_max = 120
-margin = 0
-
+i_x_min = 700-margin #450 - ??
+i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
+i_y_min = 475-margin #475 - ??
+i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
+i_z_min = 160-margin #160 - ??
+i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
 
 # conversion pixel to µm
 pixel_to_um_135 = 13.5 # µm/pixel
