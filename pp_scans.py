@@ -676,10 +676,5 @@ ax1.legend()
 plt.savefig(folder_seg+'/S_cement_weighthed_resume.png')
 plt.close()
 
-#fig, ax1 = plt.subplots(1,1, figsize=(16,9), num=1)
-#ax1.scatter(L_S_cement_weighted_pp_148[:-1], L_cum_n_S_cement_weighted_pp, label='ct-scan (14.8 um/pixel)')
-#ax1.set_xlabel('size (um^2)')
-#ax1.set_ylabel('cumulative probability (-)')
-#ax1.legend()
-#plt.savefig('seg/S_cement_weighthed_resume.png')
-#plt.close()
+# save the python script 
+shutil.copy('pp_scans.py', folder_seg+'/pp_scans.py')
