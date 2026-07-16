@@ -90,7 +90,7 @@ margin = 10
 # size of sub_REV
 size_subrev = 125
 
-# extractionf
+# extraction
 i_x_min = 575-margin #450 - 825
 i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
 i_y_min = 475-margin #475 - 850
