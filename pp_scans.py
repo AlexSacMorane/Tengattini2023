@@ -90,12 +90,12 @@ margin = 10
 # size of sub_REV
 size_subrev = 125
 
-# extraction
-i_x_min = 700-margin #450 - ??
+# extractionf
+i_x_min = 575-margin #450 - 825
 i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
-i_y_min = 475-margin #475 - ??
+i_y_min = 475-margin #475 - 850
 i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
-i_z_min = 160-margin #160 - ??
+i_z_min = 410-margin #160 - 1285
 i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
 
 # conversion pixel to µm
@@ -202,6 +202,10 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
     L_NCC_large = []
     L_M_bin_grain_i_max = []
     L_parameter_test_max = []
+
+    # debug
+    L_delta_param = []
+    
     # iterate on the labels
     for i_label in np.unique(M_bin_grain_labelled)[1:]:
         print('label: ', i_label, '/', np.max(M_bin_grain_labelled))
@@ -235,10 +239,10 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
             print('fit')
             # try to find a better fit 
             NCC_i_max = 0 
-            L_radius_test = np.arange(radius-1.5, radius+1.6, 0.5)
-            L_center_x_test = np.arange(center[0]-1.5, center[0]+1.6, 0.5)
-            L_center_y_test = np.arange(center[1]-1.5, center[1]+1.6, 0.5)
-            L_center_z_test = np.arange(center[2]-1.5, center[2]+1.6, 0.5)
+            L_radius_test = np.arange(radius-0.6, radius+0.6, 0.25)
+            L_center_x_test = np.arange(center[0]-0.5, center[0]+0.6, 0.25)
+            L_center_y_test = np.arange(center[1]-0.5, center[1]+0.6, 0.25)
+            L_center_z_test = np.arange(center[2]-0.5, center[2]+0.6, 0.25)
             parameter_test_max = (L_radius_test[0], L_center_x_test[0], L_center_y_test[1], L_center_z_test[2])
 
             # introduce perturbation in the radius
@@ -268,6 +272,12 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
             if margin < parameter_test_max[1] and parameter_test_max[1] < M_bin_grain_i.shape[0]-margin and \
                 margin < parameter_test_max[2] and parameter_test_max[2] < M_bin_grain_i.shape[1]-margin and \
                 margin < parameter_test_max[3] and parameter_test_max[3] < M_bin_grain_i.shape[2]-margin:
+
+                # debug
+                L_delta_param.append((parameter_test_max[0]-radius,\
+                                 parameter_test_max[1]-center[0],\
+                                 parameter_test_max[2]-center[1],\
+                                 parameter_test_max[3]-center[2]))
 
                 # update the map of reference
                 M_bin_grain_extract = M_bin_grain_extract + M_bin_grain_i.copy()
@@ -312,12 +322,35 @@ if not Path(folder_seg+'/tempo_save.dict').exists():
     plt.savefig(folder_seg+'/grain_resume.png')
     plt.close()
 
+    # debug 
+    L_delta_radius = []
+    L_delta_center_x = []
+    L_delta_center_y = []
+    L_delta_center_z = []
+    for param in L_delta_param:
+        L_delta_radius.append(param[0])
+        L_delta_center_x.append(param[1])
+        L_delta_center_y.append(param[2])
+        L_delta_center_z.append(param[3])
+    
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9), num=1)
+    ax1.hist(L_delta_radius)
+    ax1.set_title('delta radius')
+    ax2.hist(L_delta_center_x)
+    ax2.set_title('delta pos x')
+    ax3.hist(L_delta_center_y)
+    ax3.set_title('delta pos y')
+    ax4.hist(L_delta_center_z)
+    ax4.set_title('delta pos z')
+    plt.savefig(folder_seg+'/grain_resume_deltas.png')
+    plt.close()
+
     # start to save output of segmentation
     L_rad = []
     L_pos = []
     for i_parameter in range(len(L_parameter_test_max)):
         L_rad.append(L_parameter_test_max[i_parameter][0])
-        L_pos.append(np.array([L_parameter_test_max[i_parameter][1], L_parameter_test_max[i_parameter][2], L_parameter_test_max[i_parameter][3]]))
+        L_pos.append(np.array([L_parameter_test_max[i_parameter][1], L_parameter_test_max[i_parameter][2], L_parameter_test_max[i_parameter][3]])-np.array([margin, margin, margin]))
     dict_seg['L_pos_pixel'] = L_pos.copy()
     dict_seg['L_rad_pixel'] = L_rad.copy()
     #dict_seg['L_NCC_grain'] = L_NCC_large.copy()
