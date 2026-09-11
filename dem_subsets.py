@@ -396,9 +396,9 @@ def SavePlot_data_confinement():
                  counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0*100,\
                  Sx=sx, Sy=sy, Sz=sz,\
                  conf_verified= 1/3*sx/P_confinement*100 + 1/3*sy/P_confinement*100 + 1/3*sz/P_confinement*100,\
-                 strain_x=100*((O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])-(O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0]))/(O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0]),
-                 strain_y=100*((O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1])-(O.bodies[3].state.refPos[1]-O.bodies[2].state.refPos[1]))/(O.bodies[3].state.refPos[1]-O.bodies[2].state.refPos[1]),
-                 strain_z=100*((O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])-(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
+                 strain_x=100*((O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0])-(O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0]))/(O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0]),
+                 strain_y=100*((O.bodies[3].state.refPos[1]-O.bodies[2].state.refPos[1])-(O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1]))/(O.bodies[3].state.refPos[1]-O.bodies[2].state.refPos[1]),
+                 strain_z=100*((O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2]))/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
 
     # plot
     plot.saveDataTxt('data/confinement_'+O.tags['d.id']+'.txt')
