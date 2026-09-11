@@ -640,16 +640,16 @@ def SavePlot_data():
     # compute the stress on the three directions
     sx = (abs(O.forces.f(0)[0])+abs(O.forces.f(1)[0]))/2/((O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1])*(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2]))
     sy = (abs(O.forces.f(2)[1])+abs(O.forces.f(3)[1]))/2/((O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])*(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2]))
-    sz = (abs(O.forces.f(4)[2])+abs(O.forces.f(5)[2]))/2/((O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])*(O.bodies[3].state.pos[1]-O.bodies[3].state.pos[1]))
+    sz = (abs(O.forces.f(4)[2])+abs(O.forces.f(5)[2]))/2/((O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])*(O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1]))
     
     # add data
     plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(), unbalanced_max=max(L_unbalanced_ite),\
                 counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0*100,\
                 Sx=sx, Sy=sy, Sz=sz, \
                 conf_verified= 1/2*sx/(P_confinement)*100 + 1/2*sy/(P_confinement)*100, \
-                strain_x=100*(O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])/(O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0]),
-                strain_y=100*(O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1])/(O.bodies[3].state.refPos[1]-O.bodies[3].state.refPos[1]),
-                strain_z=100*(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])/(O.bodies[5].state.refPos[2]-O.bodies[5].state.refPos[2]),
+                strain_x=100*((O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0])-(O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0]))/(O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0]),
+                strain_y=100*((O.bodies[3].state.refPos[1]-O.bodies[2].state.refPos[1])-(O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1]))/(O.bodies[3].state.refPos[1]-O.bodies[2].state.refPos[1]),
+                strain_z=100*((O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2]))/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]),
                 x_min_dom=O.bodies[0].state.pos[0], x_max_dom=O.bodies[1].state.pos[0], y_min_dom=O.bodies[2].state.pos[1], y_max_dom=O.bodies[3].state.pos[1], z_min_dom=O.bodies[4].state.pos[2], z_max_dom=O.bodies[5].state.pos[2])
 
     # plot
