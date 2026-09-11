@@ -685,16 +685,17 @@ def SavePlot_data():
         #L_sigma_deviatoric_ref_500 = [0, 230e3, 678e3, 1166e3, 1423e3, 1449e3, 1399e3, 1336e3, 1248e3, 1250e3, 1200e3]
         #L_strain_z_ref_1000         = [0,  0.04,  0.29,   0.74,   1.32,   2.18,   3.32,   4.19,   5.04,   6.80,   8.05,   9.88,  11.48,  13.20]
         #L_sigma_deviatoric_ref_1000 = [0, 243e3, 742e3, 1434e3, 2138e3, 2778e3, 3163e3, 3356e3, 3292e3, 3038e3, 2732e3, 2568e3, 2352e3, 2276e3]
-        #L_strain_z_ref_1500         = [0,   0.85,   1.56,   2.43,   3.25,   4.90,   6.64,   8.20,   8.85,   9.74]
-        #L_sigma_deviatoric_ref_1500 = [0, 2483e3, 3545e3, 4160e3, 4532e3, 4405e3, 4100e3, 3756e3, 3513e3, 3399e3]
+        L_strain_z_ref_1500         = [0,   0.85,   1.56,   2.43,   3.25,   4.90,   6.64,   8.20,   8.85,   9.74]
+        L_sigma_deviatoric_ref_1500 = [0,  2.483,  3.545,  4.160,  4.532,  4.405,  4.100,  3.756,  3.513,  3.399] # MPa
         #L_strain_damage_ref_1500 = [0, 0.88, 2.00, 3.59, 5.03, 6.66, 8.23, 9.74]
         #L_damage_ref_1500        = [0, 0.07, 0.12, 0.19, 0.27, 0.34, 0.39, 0.44]
         
         # (6% cement)
-        L_strain_z_ref_1000         = [0,  0.21,   0.52,   0.81,   1.32,   1.84,   2.46,   2.96,   3.60,   4.20,   5.29,   5.98,   6.78,   7.48,   8.47,   9.52,   9.99]
-        L_sigma_deviatoric_ref_1000 = [0, 580e3, 1050e3, 1380e3, 1730e3, 2130e3, 2340e3, 2520e3, 2590e3, 2660e3, 2610e3, 2590e3, 2530e3, 2480e3, 2380e3, 2300e3, 2240e3]
-        L_strain_z_ref_1500         = [0,  0.13,   0.43,   0.78,   1.20,   1.89,   3.04,   4.05,   5.03,   6.34,   7.57,   8.85,   10.01]
-        L_sigma_deviatoric_ref_1500 = [0, 470e3, 1570e3, 2200e3, 2730e3, 3290e3, 3780e3, 4160e3, 4140e3, 3910e3, 3780e3, 3500e3,  3480e3]
+        # not the ct-scan
+        #L_strain_z_ref_1000         = [0,  0.21,   0.52,   0.81,   1.32,   1.84,   2.46,   2.96,   3.60,   4.20,   5.29,   5.98,   6.78,   7.48,   8.47,   9.52,   9.99]
+        #L_sigma_deviatoric_ref_1000 = [0, 580e3, 1050e3, 1380e3, 1730e3, 2130e3, 2340e3, 2520e3, 2590e3, 2660e3, 2610e3, 2590e3, 2530e3, 2480e3, 2380e3, 2300e3, 2240e3]
+        #L_strain_z_ref_1500         = [0,  0.13,   0.43,   0.78,   1.20,   1.89,   3.04,   4.05,   5.03,   6.34,   7.57,   8.85,   10.01]
+        #L_sigma_deviatoric_ref_1500 = [0, 470e3, 1570e3, 2200e3, 2730e3, 3290e3, 3780e3, 4160e3, 4140e3, 3910e3, 3780e3, 3500e3,  3480e3]
         
         # plot
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
@@ -725,8 +726,8 @@ def SavePlot_data():
         #    ax4.plot(L_strain_z_ref_500, L_sigma_deviatoric_ref_500, linestyle='dashed', color='k')
         #if P_confinement == 1.0e6:
         #    ax4.plot(L_strain_z_ref_1000, L_sigma_deviatoric_ref_1000, linestyle='dashed', color='k')
-        #if P_confinement == 1.5e6:
-        #    ax4.plot(L_strain_z_ref_1500, L_sigma_deviatoric_ref_1500, linestyle='dashed', color='k')
+        if P_confinement == 1.5e6:
+            ax4.plot(L_strain_z_ref_1500, L_sigma_deviatoric_ref_1500, linestyle='dashed', color='k')
         ax4.set_xlabel(r'$\epsilon_z$ (%)')
         ax4.set_ylabel(r'Deviatoric stress (MPa)')
         
@@ -745,7 +746,7 @@ def SavePlot_data():
         #ax6.set_ylabel(r'Lateral strain (%)')
 
         plt.suptitle(r'Trackers - loading step (-)')
-        plt.savefig('plot/'+O.tags['d.id']+'.png')
+        plt.savefig('plot_'+O.tags['d.id']+'/'+O.tags['d.id']+'.png')
         plt.close()
 
 #-------------------------------------------------------------------------------
