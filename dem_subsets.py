@@ -308,7 +308,7 @@ def checkUnbalanced_confinement():
     Wait to reach the confining pressure.
     '''
     global L_rel_error_x, L_rel_error_y, L_rel_error_z, \
-        L_unbalanced_ite, L_count_bond, L_confinement_x_ite, L_confinement_y_ite
+        L_unbalanced_ite, L_count_bond, L_confinement_x_ite, L_confinement_y_ite, i_load
     
     # save and plot data
     SavePlot_data_confinement()
