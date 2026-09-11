@@ -624,14 +624,12 @@ def stopLoad():
     print("\nSimulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
 
     # save simulation
-    # /!\ TODO (create and select saving) :!\
-    #save_folder = '../../DEM/Data_Tengattini2023/'+O.tags['d.id']
-    #os.mkdir(save_folder)
-    #shutil.copytree('data',save_folder+'/data')
-    #shutil.copytree('plot',save_folder+'/plot')
-    #shutil.copytree('vtk',save_folder+'/vtk')
-    #shutil.copy('Tengattini2023.py',save_folder+'/Tengattini2023.py')
-    #shutil.copy(O.tags['d.id']+'_report.txt',save_folder+'/'+O.tags['d.id']+'_report.txt')
+    save_folder = 'Data_Tengattini2023/'+O.tags['d.id']
+    os.mkdir(save_folder)
+    shutil.move('data',save_folder+'/data')
+    shutil.move('plot',save_folder+'/plot')
+    shutil.move(O.tags['d.id']+'_report.txt', save_folder+'/'+O.tags['d.id']+'_report.txt')
+    shutil.copy('dem_subsets.py',save_folder+'/dem_subsets.py')
 
 #-------------------------------------------------------------------------------
 
