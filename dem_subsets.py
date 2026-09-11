@@ -389,7 +389,7 @@ def SavePlot_data_confinement():
                  strain_z=100*((O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2]))/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
 
     # plot
-    plot.saveDataTxt('data/confinement_'+O.tags['d.id']+'.txt')
+    plot.saveDataTxt('data_'+O.tags['d.id']+'/confinement_'+O.tags['d.id']+'.txt')
     # post-proccess
     L_sigma_x = []
     L_sigma_y = []
@@ -404,7 +404,7 @@ def SavePlot_data_confinement():
     L_strain_z = []
     L_strain_vol = []
     L_n_bond = []
-    file = 'data/confinement_'+O.tags['d.id']+'.txt'
+    file = 'data_'+O.tags['d.id']+'/confinement_'+O.tags['d.id']+'.txt'
     data = np.genfromtxt(file, skip_header=1)
     file_read = open(file, 'r')
     lines = file_read.readlines()
@@ -459,7 +459,7 @@ def SavePlot_data_confinement():
         ax6.plot(L_ite, L_coordination)
         ax6.set_title('Coordination number (-)')
 
-        plt.savefig('plot/confinement_'+O.tags['d.id']+'.png')
+        plt.savefig('plot_'+O.tags['d.id']+'/confinement_'+O.tags['d.id']+'.png')
 
         plt.close()
 
@@ -546,7 +546,7 @@ def checkUnbalanced():
         ax3.plot(L_count_bond)
         ax3.set_title('Number of bond (-)')
         # close
-        fig.savefig('plot/tracking_ite_'+str(i_load)+'.png')
+        #fig.savefig('plot_'+O.tags['d.id']+'/tracking_ite_'+str(i_load)+'.png')
         plt.close()
 
     # trackers
@@ -614,8 +614,8 @@ def stopLoad():
     # save simulation
     save_folder = 'Data_Tengattini2023/'+O.tags['d.id']
     os.mkdir(save_folder)
-    shutil.move('data',save_folder+'/data')
-    shutil.move('plot',save_folder+'/plot')
+    shutil.move('data_'+O.tags['d.id'],save_folder+'/data')
+    shutil.move('plot_'+O.tags['d.id'],save_folder+'/plot')
     shutil.move(O.tags['d.id']+'_report.txt', save_folder+'/'+O.tags['d.id']+'_report.txt')
     shutil.copy('dem_subsets.py',save_folder+'/dem_subsets.py')
 
@@ -641,7 +641,7 @@ def SavePlot_data():
                 x_min_dom=O.bodies[0].state.pos[0], x_max_dom=O.bodies[1].state.pos[0], y_min_dom=O.bodies[2].state.pos[1], y_max_dom=O.bodies[3].state.pos[1], z_min_dom=O.bodies[4].state.pos[2], z_max_dom=O.bodies[5].state.pos[2])
 
     # plot
-    plot.saveDataTxt('data/'+O.tags['d.id']+'.txt')
+    plot.saveDataTxt('data_'+O.tags['d.id']+'/'+O.tags['d.id']+'.txt')
 
     # post-proccess
     L_coordination = []
@@ -657,7 +657,7 @@ def SavePlot_data():
     L_strain_y = []
     L_strain_z = []
     L_shear_strain = []
-    file = 'data/'+O.tags['d.id']+'.txt'
+    file = 'data_'+O.tags['d.id']+'/'+O.tags['d.id']+'.txt'
     data = np.genfromtxt(file, skip_header=1)
     file_read = open(file, 'r')
     lines = file_read.readlines()
