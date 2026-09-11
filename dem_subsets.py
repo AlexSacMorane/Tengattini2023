@@ -72,6 +72,7 @@ unbalancedForce_criteria = 0.01
 simulation_report_name = O.tags['d.id']+'_report.txt'
 simulation_report = open(simulation_report_name, 'w')
 simulation_report.write('Triaxial Loading test\n')
+simulation_report.write('Subset : '+subset_name+'\n')
 simulation_report.close()
 
 #-------------------------------------------------------------------------------
