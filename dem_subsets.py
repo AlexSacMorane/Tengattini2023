@@ -724,8 +724,8 @@ def SavePlot_data():
         ax2b.plot(L_strain_z, L_ratio_bond_broken_pp, 'indianred')
         ax2b.set_ylabel('Ratio (-)', color='r')
         # add Tengattini 2023 
-        if P_confinement == 1.5e6:
-            ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
+        #if P_confinement == 1.5e6:
+        #    ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
 
         ax3.plot(L_strain_z, L_unbalanced_max)
         ax3.set_ylabel('unbalanced max (-)')
@@ -733,14 +733,14 @@ def SavePlot_data():
 
         ax4.plot(L_strain_z, L_sigma_deviatoric)
         # add Tengattini 2023
-        if P_confinement == 0.5e6:
-            ax4.plot(L_strain_z_ref_500, L_sigma_deviatoric_ref_500, linestyle='dashed', color='k')
-        if P_confinement == 1.0e6:
-            ax4.plot(L_strain_z_ref_1000, L_sigma_deviatoric_ref_1000, linestyle='dashed', color='k')
-        if P_confinement == 1.5e6:
-            ax4.plot(L_strain_z_ref_1500, L_sigma_deviatoric_ref_1500, linestyle='dashed', color='k')
+        #if P_confinement == 0.5e6:
+        #    ax4.plot(L_strain_z_ref_500, L_sigma_deviatoric_ref_500, linestyle='dashed', color='k')
+        #if P_confinement == 1.0e6:
+        #    ax4.plot(L_strain_z_ref_1000, L_sigma_deviatoric_ref_1000, linestyle='dashed', color='k')
+        #if P_confinement == 1.5e6:
+        #    ax4.plot(L_strain_z_ref_1500, L_sigma_deviatoric_ref_1500, linestyle='dashed', color='k')
         ax4.set_xlabel(r'$\epsilon_z$ (%)')
-        ax4.set_ylabel(r'Deviatoric stress (Pa)')
+        ax4.set_ylabel(r'Deviatoric stress (MPa)')
         
         #ax4.plot(L_shear_strain, L_sigma_deviatoric)
         #ax4.set_xlabel(r'$\epsilon_q$ (%)')
