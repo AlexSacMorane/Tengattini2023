@@ -675,25 +675,21 @@ def SavePlot_data():
     lines = file_read.readlines()
     file_read.close()
     if len(lines) >= 3:
-        O.pause()
-        print('check the indice of the data')
 
         for i in range(len(data)):
-
-            # /!\ TODO (check the indice of the data) /!\
-            L_sigma_x.append(data[i][0])
-            L_sigma_y.append(data[i][1])
-            L_sigma_z.append(data[i][2])
+            L_sigma_x.append(data[i][0]/1e6)
+            L_sigma_y.append(data[i][1]/1e6)
+            L_sigma_z.append(data[i][2]/1e6)
             L_sigma_deviatoric.append(1/2*(L_sigma_z[-1]-L_sigma_x[-1]) + 1/2*(L_sigma_z[-1]-L_sigma_y[-1]))
-            L_coordination.append(data[i][7])
-            L_n_bond.append(data[i][8])
-            L_ratio_bond_broken_pp.append((data[0][8]-data[i][8])/data[0][8])
-            L_ratio_bond_broken.append(data[i][11]/100)
-            L_strain_x.append(abs(data[i][12]))
-            L_strain_y.append(abs(data[i][13]))
-            L_strain_z.append(abs(data[i][14]))
+            L_coordination.append(data[i][4])
+            L_n_bond.append(data[i][5])
+            L_ratio_bond_broken_pp.append((data[0][5]-data[i][5])/data[0][5])
+            L_ratio_bond_broken.append(data[i][8]/100)
+            L_strain_x.append(abs(data[i][9]))
+            L_strain_y.append(abs(data[i][10]))
+            L_strain_z.append(abs(data[i][11]))
             L_shear_strain.append(abs(1/2*2/3*(L_strain_z[-1]-L_strain_x[-1]) + 1/2*2/3*(L_strain_z[-1]-L_strain_y[-1])))
-            L_unbalanced_max.append(data[i][16])
+            L_unbalanced_max.append(data[i][12])
 
         # Add Tengattini 2023 for 500, 1000, 1500 kPa of confinement
         # (8% cement)
