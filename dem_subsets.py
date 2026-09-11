@@ -107,21 +107,8 @@ tic_0 = tic
 iter_0 = 0
 
 # plan simulation
-if Path('plot').exists():
-    shutil.rmtree('plot')
-os.mkdir('plot')
-if Path('data').exists():
-    shutil.rmtree('data')
-os.mkdir('data')
-if Path('vtk').exists():
-    shutil.rmtree('vtk')
-os.mkdir('vtk')
-if Path('save').exists():
-    shutil.rmtree('save')
-os.mkdir('save')
-files = glob.glob('*_report.txt')
-for file in files:
-    os.remove(file)
+os.mkdir('plot_'+O.tags['d.id'])
+os.mkdir('data_'+O.tags['d.id'])
 
 # define wall material (no friction)
 O.materials.append(CohFrictMat(young=YoungModulus_particle, poisson=poisson_particle, frictionAngle=0, density=density_grain, isCohesive=False, momentRotationLaw=False))
