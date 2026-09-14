@@ -40,27 +40,28 @@ z_mean_dom = (z_max_dom+z_min_dom)/2
 density_grain = 2400 # kg/m3
 
 # Mechanics Particle (TBD)
-YoungModulus_particle = 0.9e9 # Pa
+YoungModulus_particle = 4e9 # Pa
 poisson_particle = 0.25 # -
 alphaKrReal = 0.00
 alphaKtwReal = alphaKrReal
 frictionAngleReal = radians(15)
 
 # Mechanics Bonds
-YoungModulus_bond = YoungModulus_particle/5 # Pa 
+YoungModulus_bond = YoungModulus_particle/3 # Pa 
 # rupture (TBD)
-tensileCohesion = 3.5*1e9 # Pa
+tensileCohesion = 1.5*1e9 # Pa
 shearCohesion = tensileCohesion # Pa
 f_artificial = 10 # only for the IC
 
 # Walls
 P_confinement = 1.5e6 # Pa
 # triaxial 
+v_wall_load = 1e-3 # -/s
 vert_strain_load = 0.1 # -
-n_load = 100
 # controler
-kp = 2*1e-10 # m.N-1
+kp = 1e-9 # m.N-1
 k_v_max = 0.000005 #-
+
 
 # time step
 factor_dt_crit = 0.5
@@ -296,9 +297,8 @@ def checkUnbalanced_confinement():
     '''
     Wait to reach the confining pressure.
     '''
-    global L_rel_error_x, L_rel_error_y, L_rel_error_z, \
-        L_unbalanced_ite, L_count_bond, L_confinement_x_ite, L_confinement_y_ite, i_load
-    
+    global L_rel_error_x, L_rel_error_y, L_rel_error_z
+        
     # save and plot data
     SavePlot_data_confinement()
     
@@ -355,26 +355,14 @@ def checkUnbalanced_confinement():
     O.bodies[5].state.vel = (0, 0, 0)
     O.engines = O.engines[:-1] + [PyRunner(command='controlWalls()', iterPeriod = 1)]
     
-    # compute vertical load 
-    vert_load = (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])*vert_strain_load 
-    # apply vertical load
-    i_load = 1
-    O.bodies[4].state.pos = O.bodies[4].state.refPos + (0, 0, vert_load/2*i_load/n_load)
-    O.bodies[5].state.pos = O.bodies[5].state.refPos - (0, 0, vert_load/2*i_load/n_load)
-
     # next time, do not call this function anymore, but the next one instead
     iter_0 = O.iter
     checker.command = 'checkUnbalanced()'
-    checker.iterPeriod = 500
+    checker.iterPeriod = 1000
 
-    # trackers    
-    L_unbalanced_ite = []
-    L_count_bond = []
-    L_confinement_x_ite = []
-    L_confinement_y_ite = []
-
-    # user print
-    print('Loading step :', i_load, '/', n_load, '-> ev =', vert_load*i_load/n_load)
+    # load application (speed control)
+    O.bodies[4].state.vel = (0, 0,  v_wall_load*(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
+    O.bodies[5].state.vel = (0, 0, -v_wall_load*(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
 
 #-------------------------------------------------------------------------------
 
@@ -521,73 +509,14 @@ def checkUnbalanced():
     """
     Look for the equilibrium during the loading phase.
     """
-    global i_load, L_unbalanced_ite, L_confinement_x_ite, L_confinement_y_ite, L_count_bond
-    # track and plot unbalanced
-    L_unbalanced_ite.append(unbalancedForce())
+    # save data
+    SavePlot_data()
+
+    # check simulation stop conditions
+    if (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]) > \
+        vert_strain_load:
+        stopLoad()
     
-    # compute target
-    target_x = P_confinement*(O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1])*(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])
-    target_y = P_confinement*(O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])*(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])
-    # compute force
-    Fx = (abs(O.forces.f(0)[0])+abs(O.forces.f(1)[0]))/2
-    Fy = (abs(O.forces.f(2)[1])+abs(O.forces.f(3)[1]))/2
-    # track and plot confinement
-    L_confinement_x_ite.append(Fx/target_x*100)
-    L_confinement_y_ite.append(Fy/target_y*100)
-    # track and plot bonds number
-    L_count_bond.append(count_bond())
-
-    # plot
-    if len(L_unbalanced_ite)>2:
-        fig, ((ax1, ax2, ax3)) = plt.subplots(1,3, figsize=(16,9),num=1)
-        # unbalanced
-        ax1.plot(L_unbalanced_ite)
-        ax1.set_title('unbalanced force (-)')
-        ax1.set_ylim(ymin=0, ymax=2*unbalancedForce_criteria)
-        # confinement
-        ax2.plot(L_confinement_x_ite)
-        ax2.plot(L_confinement_y_ite)
-        ax2.set_ylim(ymin=0, ymax=150)
-        ax2.set_title('confinements (%)')
-        # number of bond
-        ax3.plot(L_count_bond)
-        ax3.set_title('Number of bond (-)')
-        # close
-        #fig.savefig('plot_'+O.tags['d.id']+'/tracking_ite_'+str(i_load)+'.png')
-        plt.close()
-
-    # trackers
-    if len(L_confinement_x_ite) < window:
-        return
-    # check the force applied
-    if min(L_confinement_x_ite[-window:]) < 99 or 101 < max(L_confinement_x_ite[-window:]) or \
-        min(L_confinement_y_ite[-window:]) < 99 or 101 < max(L_confinement_y_ite[-window:]):
-        return
-    
-    # verify unbalanced force criteria
-    if unbalancedForce() < unbalancedForce_criteria:
-        # save data
-        SavePlot_data()
-
-        # apply vertical load
-        vert_load = (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])*vert_strain_load 
-        i_load = i_load + 1
-        O.bodies[4].state.pos = O.bodies[4].state.refPos + (0, 0, vert_load/2*i_load/n_load)
-        O.bodies[5].state.pos = O.bodies[5].state.refPos - (0, 0, vert_load/2*i_load/n_load)
-
-        # reset trackers
-        L_unbalanced_ite = []
-        L_confinement_x_ite = []
-        L_confinement_y_ite = []
-        L_count_bond = []
-        
-        # check simulation stop conditions
-        if i_load > n_load:
-            stopLoad()
-        else :
-            # user print
-            print('Loading step :', i_load, '/', n_load, '-> ev =', vert_strain_load*i_load/n_load)
-
 #-------------------------------------------------------------------------------
 
 def stopLoad():
@@ -638,7 +567,7 @@ def SavePlot_data():
     sz = (abs(O.forces.f(4)[2])+abs(O.forces.f(5)[2]))/2/((O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0])*(O.bodies[3].state.pos[1]-O.bodies[2].state.pos[1]))
     
     # add data
-    plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(), unbalanced_max=max(L_unbalanced_ite),\
+    plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(),\
                 counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0*100, bond_margin=compute_margin(),\
                 Sx=sx, Sy=sy, Sz=sz, \
                 conf_verified= 1/2*sx/(P_confinement)*100 + 1/2*sy/(P_confinement)*100, \
@@ -656,11 +585,12 @@ def SavePlot_data():
     L_margin_bond = []
     L_ratio_bond_broken = []
     L_ratio_bond_broken_pp = []
-    L_unbalanced_max = []
+    L_unbalanced = []
     L_sigma_x = []
     L_sigma_y = []
     L_sigma_z = []
     L_sigma_deviatoric = []
+    L_confinement = []
     L_strain_x = []
     L_strain_y = []
     L_strain_z = []
@@ -678,6 +608,7 @@ def SavePlot_data():
             L_sigma_z.append(data[i][2]/1e6)
             L_sigma_deviatoric.append(1/2*(L_sigma_z[-1]-L_sigma_x[-1]) + 1/2*(L_sigma_z[-1]-L_sigma_y[-1]))
             L_margin_bond.append(data[i][3])
+            L_confinement.append(data[i][4])
             L_coordination.append(data[i][5])
             L_n_bond.append(data[i][6])
             L_ratio_bond_broken_pp.append((data[0][6]-data[i][6])/data[0][6])
@@ -686,7 +617,7 @@ def SavePlot_data():
             L_strain_y.append(abs(data[i][11]))
             L_strain_z.append(abs(data[i][12]))
             L_shear_strain.append(abs(1/2*2/3*(L_strain_z[-1]-L_strain_x[-1]) + 1/2*2/3*(L_strain_z[-1]-L_strain_y[-1])))
-            L_unbalanced_max.append(data[i][13])
+            L_unbalanced.append(data[i][13])
 
         # Add Tengattini 2023 for 500, 1000, 1500 kPa of confinement
         # (8% cement)
@@ -732,8 +663,13 @@ def SavePlot_data():
         #if P_confinement == 1.5e6:
         #    ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
 
-        ax3.plot(L_strain_z, L_unbalanced_max)
-        ax3.set_ylabel('unbalanced max (-)')
+        ax3.plot(L_strain_z, L_unbalanced, color='b')
+        ax3.tick_params(axis='y', labelcolor='b')
+        ax3.set_ylabel('unbalanced (-)', color='b')
+        ax3b = ax3.twinx()
+        ax3b.plot(L_strain_z, L_confinement, color='r')
+        ax3b.tick_params(axis='y', labelcolor='r')
+        ax3b.set_ylabel('confinement (%)', color='r')
         ax3.set_xlabel(r'$\epsilon_z$ (%)')
 
         ax4.plot(L_strain_z, L_sigma_deviatoric)
