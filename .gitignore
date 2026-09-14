@@ -16,6 +16,9 @@ Data_Tengattini2023
 # copies of the files
 pp_scans_*
 
+# archive with the old scripts
+old_scripts
+
 # Folders created during the simulation
 data*
 plot*
