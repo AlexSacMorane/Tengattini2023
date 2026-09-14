@@ -17,8 +17,8 @@ Data_Tengattini2023
 pp_scans_*
 
 # Folders created during the simulation
-data
-plot
+data*
+plot*
 save
 vtk
 scan
