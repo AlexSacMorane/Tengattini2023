@@ -51,6 +51,7 @@ YoungModulus_bond = YoungModulus_particle/5 # Pa
 # rupture (TBD)
 tensileCohesion = 3.5*1e9 # Pa
 shearCohesion = tensileCohesion # Pa
+f_artificial = 10 # only for the IC
 
 # Walls
 P_confinement = 1.5e6 # Pa
@@ -155,8 +156,8 @@ for i_bond in range(len(dict_seg['L_ij_contact'])):
     # determine the cohesive surface
     cohesiveSurface = dict_seg['L_S_cement_weighted_pixel'][i_bond]*pixel_to_m*pixel_to_m # m2
     # set normal and shear adhesions
-    i.phys.normalAdhesion = tensileCohesion*cohesiveSurface
-    i.phys.shearAdhesion = shearCohesion*cohesiveSurface
+    i.phys.normalAdhesion = tensileCohesion*cohesiveSurface*f_artificial
+    i.phys.shearAdhesion = shearCohesion*cohesiveSurface*f_artificial
     # local law
     localYoungModulus = YoungModulus_particle + YoungModulus_bond*cohesiveSurface/mean_cohesiveSurface
     i.phys.kn = localYoungModulus*(O.bodies[i.id1].shape.radius*2*O.bodies[i.id2].shape.radius*2)/(O.bodies[i.id1].shape.radius*2+O.bodies[i.id2].shape.radius*2)
@@ -333,8 +334,14 @@ def checkUnbalanced_confinement():
     simulation_report.close()
     print("\nConfining pressure applied : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
     print('next step is the loading\n')
-    # next time, do not call this function anymore, but the next one instead
-    checker.command = 'checkUnbalanced_loading()'
+
+    # deactivate the artificial increase in bond strengths
+    for i in O.interactions:
+        if isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere):
+            # bond not broken
+            if not i.phys.cohesionBroken :
+                i.phys.normalAdhesion = i.phys.normalAdhesion/f_artificial
+                i.phys.shearAdhesion = i.phys.shearAdhesion/f_artificial        
 
     # reset plot (IC done, simulation starts)
     plot.reset()
