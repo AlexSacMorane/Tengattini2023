@@ -632,7 +632,7 @@ def SavePlot_data():
     
     # add data
     plot.addData(i=O.iter-iter_0, porosity=porosity(), coordination=avgNumInteractions(), unbalanced=unbalancedForce(), unbalanced_max=max(L_unbalanced_ite),\
-                counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0*100,\
+                counter_bond=count_bond(), ratio_bond_broken=(counter_bond0-count_bond())/counter_bond0*100, bond_margin=compute_margin(),\
                 Sx=sx, Sy=sy, Sz=sz, \
                 conf_verified= 1/2*sx/(P_confinement)*100 + 1/2*sy/(P_confinement)*100, \
                 strain_x=100*((O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0])-(O.bodies[1].state.pos[0]-O.bodies[0].state.pos[0]))/(O.bodies[1].state.refPos[0]-O.bodies[0].state.refPos[0]),
@@ -646,6 +646,7 @@ def SavePlot_data():
     # post-proccess
     L_coordination = []
     L_n_bond = []
+    L_margin_bond = []
     L_ratio_bond_broken = []
     L_ratio_bond_broken_pp = []
     L_unbalanced_max = []
@@ -669,15 +670,16 @@ def SavePlot_data():
             L_sigma_y.append(data[i][1]/1e6)
             L_sigma_z.append(data[i][2]/1e6)
             L_sigma_deviatoric.append(1/2*(L_sigma_z[-1]-L_sigma_x[-1]) + 1/2*(L_sigma_z[-1]-L_sigma_y[-1]))
-            L_coordination.append(data[i][4])
-            L_n_bond.append(data[i][5])
-            L_ratio_bond_broken_pp.append((data[0][5]-data[i][5])/data[0][5])
-            L_ratio_bond_broken.append(data[i][8]/100)
-            L_strain_x.append(abs(data[i][9]))
-            L_strain_y.append(abs(data[i][10]))
-            L_strain_z.append(abs(data[i][11]))
+            L_margin_bond.append(data[i][3])
+            L_coordination.append(data[i][5])
+            L_n_bond.append(data[i][6])
+            L_ratio_bond_broken_pp.append((data[0][6]-data[i][6])/data[0][6])
+            L_ratio_bond_broken.append(data[i][9]/100)
+            L_strain_x.append(abs(data[i][10]))
+            L_strain_y.append(abs(data[i][11]))
+            L_strain_z.append(abs(data[i][12]))
             L_shear_strain.append(abs(1/2*2/3*(L_strain_z[-1]-L_strain_x[-1]) + 1/2*2/3*(L_strain_z[-1]-L_strain_y[-1])))
-            L_unbalanced_max.append(data[i][12])
+            L_unbalanced_max.append(data[i][13])
 
         # Add Tengattini 2023 for 500, 1000, 1500 kPa of confinement
         # (8% cement)
@@ -706,12 +708,19 @@ def SavePlot_data():
 
         ax2.plot(L_strain_z, L_n_bond, 'b')
         ax2.set_ylabel('Number (-)', color='b')
+        ax2.tick_params(axis='y', labelcolor='b')
         ax2.set_xlabel(r'$\epsilon_z$ (%)')
         ax2.set_title('Bonds (-)')
         ax2b = ax2.twinx()
         ax2b.plot(L_strain_z, L_ratio_bond_broken, 'r')
         ax2b.plot(L_strain_z, L_ratio_bond_broken_pp, 'indianred')
         ax2b.set_ylabel('Ratio (-)', color='r')
+        ax2b.tick_params(axis='y', labelcolor='r')
+        ax2c = ax2.twinx()
+        ax2c.spines['right'].set_position(('outward', 60)) # offset
+        ax2c.plot(L_strain_z, L_margin_bond, color='g')
+        ax2c.set_ylabel('bond margin', color='g')
+        ax2c.tick_params(axis='y', labelcolor='g')
         # add Tengattini 2023 
         #if P_confinement == 1.5e6:
         #    ax2b.plot(L_strain_damage_ref_1500, L_damage_ref_1500, linestyle='dashed', color='r')
@@ -748,6 +757,32 @@ def SavePlot_data():
         plt.suptitle(r'Trackers - loading step (-)')
         plt.savefig('plot_'+O.tags['d.id']+'/'+O.tags['d.id']+'.png')
         plt.close()
+
+#-------------------------------------------------------------------------------
+
+def compute_margin():
+    '''
+    Compute the margin of the bonds before the rupture.
+
+    The maximum between the tensile and shear is considered.
+    '''
+    # compute the margin for the bonds (force/stiffness) 
+    margin_bond = 0
+    counter_margin = 0
+    for i in O.interactions:
+        if isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere):
+            if not i.phys.cohesionBroken :
+                # tensile margin
+                if i.geom.penetrationDepth < 0:
+                    tensile_margin = np.linalg.norm(i.phys.normalForce)/i.phys.normalAdhesion
+                else :
+                    tensile_margin = 0
+                # shear margin 
+                shear_margin = np.linalg.norm(i.phys.shearForce)/(i.phys.shearAdhesion+i.phys.tangensOfFrictionAngle*np.linalg.norm(i.phys.normalForce))
+                # take the maximum (largest potential to crack)
+                margin_bond = margin_bond + max(tensile_margin, shear_margin)
+                counter_margin = counter_margin + 1
+    return margin_bond/counter_margin
 
 #-------------------------------------------------------------------------------
 # start simulation
