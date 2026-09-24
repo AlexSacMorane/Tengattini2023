@@ -1,0 +1,230 @@
+#-------------------------------------------------------------------------------
+#Librairies
+#-------------------------------------------------------------------------------
+
+import glob, pickle, os, shutil, math
+import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import Path
+
+#-------------------------------------------------------------------------------
+#Function
+#-------------------------------------------------------------------------------
+
+def compute_distribution(L_value, L_value_pp, L_n_value_pp, L_cum_n_value_pp):
+    '''
+    Compute the distribution (and its cumulative) of a list of values.
+    '''
+    # iterate on the list
+    counter = 0
+    for value in L_value:
+        if L_value_pp[0]<=value and value<=L_value_pp[-1]:
+            i_pp = 0
+            while not(L_value_pp[i_pp]<=value and value<=L_value_pp[i_pp+1]):
+                i_pp = i_pp + 1
+            L_n_value_pp[i_pp] = L_n_value_pp[i_pp] + 1
+        else :
+            counter = counter + 1
+    #print('number of values out of the range: ', counter, '/', len(L_value))
+    # compute cumulative
+    for i in range(len(L_n_value_pp)):
+        L_cum_n_value_pp[i] = L_n_value_pp[i]/np.sum(L_n_value_pp)
+        if i > 0:
+            L_cum_n_value_pp[i] = L_cum_n_value_pp[i] + L_cum_n_value_pp[i-1]
+    return L_n_value_pp, L_cum_n_value_pp
+
+#---------------------------------------
+
+def mk_new_dir(foldername):
+    '''
+    Create a new folder (erase the preexisting, if it exists).
+    '''
+    if Path(foldername).exists():
+        shutil.rmtree(foldername)
+    os.mkdir(foldername)
+
+#-------------------------------------------------------------------------------
+#User
+#-------------------------------------------------------------------------------
+
+# find all the data
+L_seg = glob.glob('dict_seg_*_*_*_*')
+
+# prepare the folder with the result
+mk_new_dir('pp')
+
+# prepare the plot
+n_pp = 20
+L_S_cement_pp = np.linspace(0, 150, n_pp)
+L_S_cement_weighted_pp = np.linspace(0, 60, n_pp)
+L_radius_pp = np.linspace(0, 30, n_pp)
+
+# plot BSD
+fig_bsd, ax1_bsd = plt.subplots(1,1,figsize=(16,9))
+
+# plot w_BSD
+fig_wbsd, ax1_wbsd = plt.subplots(1,1,figsize=(16,9))
+
+# plot PSD
+fig_psd, ax1_psd = plt.subplots(1,1,figsize=(16,9))
+
+# name the vtk files
+vtk_name = open('pp/grains_all.vtk', 'w')
+vtk_name.write('''# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\n''')
+vtk_name.close()
+# prepare the data 
+L_pos_all = []
+L_rad_all = []
+# compute stats
+L_n_grains = []
+L_n_cemented_contacts = []
+L_porosity = []
+
+#-------------------------------------------------------------------------------
+#Read data
+#-------------------------------------------------------------------------------
+
+# iterate on the segmentations 
+for seg in L_seg:
+
+    # read the name
+    seg_name = seg[9:-5]
+
+    # load the dict
+    with open(seg, 'rb') as handle:
+        dict_seg = pickle.load(handle)
+
+    # compute the distribution of the cement area
+    L_n_S_cement_pp, L_cum_n_S_cement_pp = compute_distribution(dict_seg['L_S_cement_pixel'], L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+
+    # compute the distribution of the cement area
+    L_n_S_cement_weighted_pp, L_cum_n_S_cement_weighted_pp = compute_distribution(dict_seg['L_S_cement_weighted_pixel'], L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+
+    # compute the distribution of the particle size
+    L_n_radius_pp, L_cum_n_radius_pp = compute_distribution(dict_seg['L_rad_pixel'], L_radius_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+
+    # plot BSD
+    ax1_bsd.plot(L_S_cement_pp[:-1], L_cum_n_S_cement_pp, label=seg_name)
+
+    # plot w_BSD
+    ax1_wbsd.plot(L_S_cement_weighted_pp[:-1], L_cum_n_S_cement_weighted_pp, label=seg_name)
+
+    # plot PSD
+    ax1_psd.plot(L_radius_pp[:-1], L_cum_n_radius_pp, label=seg_name)
+
+    # write the data into a vtk
+    vtk_i_name = open('pp/grains_'+seg_name+'.vtk', 'w')
+    vtk_i_name.write('# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\n')
+    vtk_i_name.write('POINTS '+str(len(dict_seg['L_pos_pixel']))+' double\n')
+    for i_pos in range(len(dict_seg['L_pos_pixel'])):
+        vtk_i_name.write(str(dict_seg['L_pos_pixel'][i_pos][0])+ ' ' +\
+                       str(dict_seg['L_pos_pixel'][i_pos][1])+ ' ' +\
+                       str(dict_seg['L_pos_pixel'][i_pos][2])+ '\n')
+    vtk_i_name.write('\nPOINT_DATA '+str(len(dict_seg['L_pos_pixel']))+'\n')
+    vtk_i_name.write('SCALARS radius double 1\nLOOKUP_TABLE default\n')
+    for i_rad in range(len(dict_seg['L_rad_pixel'])):
+        vtk_i_name.write(str(dict_seg['L_rad_pixel'][i_rad])+ '\n')
+    vtk_i_name.close()
+
+    # find the limits of the domains
+    coord = ''
+    L_coord = []
+    for c in seg[9:-5]:
+        # read
+        if c == '_':
+            L_coord.append(int(coord))
+            coord = ''
+        # save the reading
+        elif c != '_':
+            coord = coord + c
+    L_coord.append(int(coord))
+    # extract i_x_min, i_y_min, i_z_min
+    i_x_min = L_coord[0]
+    i_y_min = L_coord[2]
+    i_z_min = L_coord[4]
+
+    # pp and save the data
+    vol = 0
+    for i_pos in range(len(dict_seg['L_pos_pixel'])):
+        L_pos_all.append([dict_seg['L_pos_pixel'][i_pos][0]+i_x_min,
+                          dict_seg['L_pos_pixel'][i_pos][1]+i_y_min,
+                          dict_seg['L_pos_pixel'][i_pos][2]+i_z_min])
+        L_rad_all.append(dict_seg['L_rad_pixel'][i_pos])
+        vol = vol + 4*math.pi/3*dict_seg['L_rad_pixel'][i_pos]**3
+
+    # save data
+    L_n_grains.append(len(dict_seg['L_pos_pixel']))
+    L_n_cemented_contacts.append(len(dict_seg['L_S_cement_pixel']))
+    L_porosity.append(1-vol/((L_coord[1]-L_coord[0])*(L_coord[3]-L_coord[2])*(L_coord[5]-L_coord[4])))
+
+#-------------------------------------------------------------------------------
+#Close plot
+#-------------------------------------------------------------------------------
+
+# plot BSD
+ax1_bsd.set_xlabel('sectional surface (pixel^2)')
+ax1_bsd.set_ylabel('cumulative probability (-)')
+#ax1_bsd.legend()
+fig_bsd.tight_layout()
+fig_bsd.savefig('pp/bond_size_distribution.png')
+plt.close()
+
+# plot w_BSD
+ax1_wbsd.set_xlabel('weighted sectional surface (pixel^2)')
+ax1_wbsd.set_ylabel('cumulative probability (-)')
+#ax1_wbsd.legend()
+fig_wbsd.tight_layout()
+fig_wbsd.savefig('pp/weighted_bond_size_distribution.png')
+plt.close()
+
+# plot PSD
+ax1_psd.set_xlabel('grain radius (pixel)')
+ax1_psd.set_ylabel('cumulative probability (-)')
+#ax1_psd.legend()
+fig_psd.tight_layout()
+fig_psd.savefig('pp/particle_size_distribution.png')
+plt.close()
+
+# plot n_grains
+fig_ng, ax1_ng = plt.subplots(1,1,figsize=(16,9))
+ax1_ng.hist(L_n_grains)
+ax1_ng.set_xlabel('number of grains (-)')
+ax1_ng.set_ylabel('occurences (-)')
+fig_ng.tight_layout()
+fig_ng.savefig('pp/hist_n_grains.png')
+plt.close()
+
+# plot n_cemented_contacts
+fig_ncc, ax1_ncc = plt.subplots(1,1,figsize=(16,9))
+ax1_ncc.hist(L_n_cemented_contacts)
+ax1_ncc.set_xlabel('number of cemented contacts (-)')
+ax1_ncc.set_ylabel('occurences (-)')
+fig_ncc.tight_layout()
+fig_ncc.savefig('pp/hist_n_contacts.png')
+plt.close()
+
+# plot porosity
+fig_p, ax1_p = plt.subplots(1,1,figsize=(16,9))
+ax1_p.hist(L_porosity)
+ax1_p.set_xlabel('porosity (-)')
+ax1_p.set_ylabel('occurences (-)')
+fig_p.tight_layout()
+fig_p.savefig('pp/hist_porosity.png')
+plt.close()
+
+
+#-------------------------------------------------------------------------------
+#write the vtk
+#-------------------------------------------------------------------------------
+
+vtk_name = open('pp/grains_all.vtk', 'a')
+vtk_name.write('POINTS '+str(len(L_pos_all))+' double\n')
+for i_pos in range(len(L_pos_all)):
+    vtk_name.write(str(L_pos_all[i_pos][0])+ ' ' +\
+                    str(L_pos_all[i_pos][1])+ ' ' +\
+                    str(L_pos_all[i_pos][2])+ '\n')
+vtk_name.write('\nPOINT_DATA '+str(len(L_rad_all))+'\n')
+vtk_name.write('SCALARS radius double 1\nLOOKUP_TABLE default\n')
+for i_rad in range(len(L_rad_all)):
+    vtk_name.write(str(L_rad_all[i_rad])+ '\n')
+vtk_name.close()
