@@ -359,18 +359,12 @@ def checkUnbalanced_confinement():
         O.bodies[id_wall].state.refPos = O.bodies[id_wall].state.pos
 
     # triaxial loading
-    O.bodies[4].state.vel = (0, 0, 0)
-    O.bodies[5].state.vel = (0, 0, 0)
     O.engines = O.engines[:-1] + [PyRunner(command='controlWalls()', iterPeriod = 1)]
     
     # next time, do not call this function anymore, but the next one instead
     iter_0 = O.iter
     checker.command = 'checkUnbalanced()'
     checker.iterPeriod = 1000
-
-    # load application (speed control)
-    O.bodies[4].state.vel = (0, 0,  v_wall_load*(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
-    O.bodies[5].state.vel = (0, 0, -v_wall_load*(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
 
 #-------------------------------------------------------------------------------
 
@@ -512,6 +506,10 @@ def controlWalls():
         else :
             O.bodies[2].state.vel = (0, -np.sign(dF)*v_plate_max, 0)
             O.bodies[3].state.vel = (0, np.sign(dF)*v_plate_max, 0)
+
+    # apply load (speed control)
+    O.bodies[4].state.vel = (0, 0,  v_wall_load*(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
+    O.bodies[5].state.vel = (0, 0, -v_wall_load*(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]))
 
 #-------------------------------------------------------------------------------
 
