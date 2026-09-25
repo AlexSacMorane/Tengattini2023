@@ -49,7 +49,6 @@ YoungModulus_bond = YoungModulus_particle/5 # Pa
 # rupture (TBD)
 tensileCohesion = 0.5*1e9 # Pa
 shearCohesion = tensileCohesion # Pa
-f_artificial = 10 # only for the IC
 
 # Walls
 P_confinement = 1.5e6 # Pa
@@ -939,7 +938,7 @@ def checkUnbalanced():
     SavePlot_data()
 
     # compute the strain
-    current_vert_strain = (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])
+    current_vert_strain = ((O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2]))/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])
 
     # user print
     global i_strain_plot, tic_i
