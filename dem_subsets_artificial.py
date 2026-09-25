@@ -522,7 +522,7 @@ def saveData_ic():
         ax6.plot(L_ite, L_coordination)
         ax6.set_title('Coordination number (-)')
 
-        plt.savefig('plot_'+O.tags['d.id']+'/confinement__'+O.tags['d.id']+'.png')
+        plt.savefig('plot_'+O.tags['d.id']+'/confinement_'+O.tags['d.id']+'.png')
 
         plt.close()
 
