@@ -62,11 +62,11 @@ kp = 1e-9 # m.N-1
 k_v_max = 0.000005 #-
 
 # time step
-factor_dt_crit = 0.5
+factor_dt_crit = 0.2
 
 # steady-state detection
 window = 10
-unbalancedForce_criteria = 0.02
+unbalancedForce_criteria = 0.01
 
 # Report
 simulation_report_name = O.tags['d.id']+'_report.txt'
