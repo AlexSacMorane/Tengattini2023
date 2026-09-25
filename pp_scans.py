@@ -1,3 +1,7 @@
+# this function is used to do a segmentation from scans of (Tengatini, 2023)
+# spherical grains (position and radius) are estimated
+# bond surfaces are estimated for each contact
+
 #-------------------------------------------------------------------------------
 #Librairies
 #-------------------------------------------------------------------------------
