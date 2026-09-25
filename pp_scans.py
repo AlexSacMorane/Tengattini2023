@@ -95,11 +95,11 @@ margin = 10
 size_subrev = 125
 
 # extraction
-i_x_min = 575-margin #450 - 825
+i_x_min = 825-margin #450 - 825
 i_x_max = i_x_min+size_subrev+2*margin #i_x_min+size_subrev*4
-i_y_min = 475-margin #475 - 850
+i_y_min = 850-margin #475 - 850
 i_y_max = i_y_min+size_subrev+2*margin #i_y_min+size_subrev*4
-i_z_min = 410-margin #160 - 1285
+i_z_min = 285-margin #160 - 1285
 i_z_max = i_z_min+size_subrev+2*margin #i_z_min+size_subrev*10
 
 # conversion pixel to µm
