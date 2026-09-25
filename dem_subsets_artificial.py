@@ -762,14 +762,6 @@ def checkUnbalanced_load_confinement_ic():
     print("\nConfining pressure applied : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
     print('next step is the loading\n')
 
-    # deactivate the artificial increase in bond strengths
-    for i in O.interactions:
-        if isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere):
-            # bond not broken
-            if not i.phys.cohesionBroken :
-                i.phys.normalAdhesion = i.phys.normalAdhesion/f_artificial
-                i.phys.shearAdhesion = i.phys.shearAdhesion/f_artificial        
-
     # reset plot (IC done, simulation starts)
     plot.reset()
 
