@@ -206,7 +206,7 @@ def checkUnbalanced_ir_ic():
     global L_rel_error_x, L_rel_error_y, L_rel_error_z
     # the rest will be run only if unbalanced is < .1 (stabilized packing)
     # Compute the ratio of mean summary force on bodies and mean force magnitude on interactions.
-    if unbalancedForce() > .1:
+    if unbalancedForce() > unbalancedForce_criteria*5:
         return
     # increase the radius of particles
     if int(O.tags['Step ic']) < n_steps_ic :
