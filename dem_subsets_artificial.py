@@ -550,7 +550,6 @@ def cementation():
             counter_bond0 = counter_bond0 + 1
             # creation of cohesion
             physFunctor.setCohesion(i, cohesive=True, resetDisp=False)
-            #i.phys.cohesionBroken = False
             # determine the cohesive surface
             cohesiveSurface = random.choices(x_L, cum_weights=cum_p_x_L)[0]*1e-12 # m2
             # set normal and shear adhesions
