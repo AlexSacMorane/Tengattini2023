@@ -784,6 +784,9 @@ def checkUnbalanced_load_confinement_ic():
     iter_0 = O.iter
     checker.command = 'checkUnbalanced()'
     checker.iterPeriod = 1000
+    global i_strain_plot, tic_i
+    i_strain_plot = 0.01
+    tic_i = time.perf_counter()
 
 #-------------------------------------------------------------------------------
 
@@ -943,9 +946,26 @@ def checkUnbalanced():
     # save data
     SavePlot_data()
 
+    # compute the strain
+    current_vert_strain = (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])
+
+    # user print
+    global i_strain_plot, tic_i
+    if i_strain_plot < current_vert_strain:
+        # compute time performance
+        tac = time.perf_counter()
+        hours = (tac-tic_i)//(60*60)
+        minutes = (tac-tic_i -hours*60*60)//(60)
+        seconds = int(tac-tic_i -hours*60*60 -minutes*60)
+        # print
+        print("Current vertical load : "+str(i_strain_plot))
+        print("Time since last print : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
+        # prepare next plot
+        i_strain_plot = i_strain_plot + 0.01
+        tic_i = time.perf_counter()
+
     # check simulation stop conditions
-    if (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]) > \
-        vert_strain_load:
+    if  vert_strain_load < current_vert_strain:
         stopLoad()
 
 #-------------------------------------------------------------------------------
