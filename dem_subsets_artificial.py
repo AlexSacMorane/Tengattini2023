@@ -27,12 +27,12 @@ pixel_to_m = pixel_to_um*1e-6
 
 # determine the domain dimension
 Dz_on_Dx = 1 # ratio Dz / Dxy
-Dz = 0.002 # m
+Dz = 0.004 # m
 Dx = Dz/Dz_on_Dx
 Dy = Dx
 
 # IC
-n_steps_ic = 100
+n_steps_ic = 200
 
 # grain properties 
 density_grain = 2400 # kg/m3
