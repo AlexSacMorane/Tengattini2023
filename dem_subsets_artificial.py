@@ -148,6 +148,8 @@ L_rel_error_y = []
 L_rel_error_z = []
 
 #-------------------------------------------------------------------------------
+#Functions used regularly
+#-------------------------------------------------------------------------------
 
 def grain_in_box():
     '''
@@ -196,7 +198,8 @@ def count_bond():
                     i.phys.ktw = i.phys.ks*alphaKtwReal*O.bodies[i.id1].shape.radius*O.bodies[i.id2].shape.radius
     return counter_bond
 
-
+#-------------------------------------------------------------------------------
+#Increase the radius of the grains
 #-------------------------------------------------------------------------------
 
 def checkUnbalanced_ir_ic():
@@ -249,6 +252,8 @@ def checkUnbalanced_ir_ic():
     L_rel_error_y = []
     L_rel_error_z = []
 
+#-------------------------------------------------------------------------------
+#Isotropic confinement until P_cementation
 #-------------------------------------------------------------------------------
 
 def controlWalls_ic():
