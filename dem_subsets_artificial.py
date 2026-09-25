@@ -1150,7 +1150,7 @@ def stopLoad():
     shutil.move('data_'+O.tags['d.id'],save_folder+'/data')
     shutil.move('plot_'+O.tags['d.id'],save_folder+'/plot')
     shutil.move(O.tags['d.id']+'_report.txt', save_folder+'/'+O.tags['d.id']+'_report.txt')
-    shutil.copy('dem_subsets.py',save_folder+'/dem_subsets.py')
+    shutil.copy('dem_subsets_artificial.py',save_folder+'/dem_subsets.py')
 
 #-------------------------------------------------------------------------------
 # start simulation
