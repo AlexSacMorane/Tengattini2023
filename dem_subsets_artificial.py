@@ -319,86 +319,6 @@ def controlWalls_ic():
 
 #-------------------------------------------------------------------------------
 
-def saveData_ic():
-    """
-    Save data in .txt file during the ic.
-    """
-    plot.saveDataTxt('data/IC_'+O.tags['d.id']+'.txt')
-    # post-proccess
-    L_sigma_x = []
-    L_sigma_y = []
-    L_sigma_z = []
-    L_sigma_mean = []
-    L_confinement = []
-    L_coordination = []
-    L_unbalanced = []
-    L_ite  = []
-    L_strain_x = []
-    L_strain_y = []
-    L_strain_z = []
-    L_strain_vol = []
-    L_n_bond = []
-    file = 'data/IC_'+O.tags['d.id']+'.txt'
-    data = np.genfromtxt(file, skip_header=1)
-    file_read = open(file, 'r')
-    lines = file_read.readlines()
-    file_read.close()
-    if len(lines) >= 3:
-        for i in range(len(data)):
-            L_sigma_x.append(abs(data[i][0]))
-            L_sigma_y.append(abs(data[i][1]))
-            L_sigma_z.append(abs(data[i][2]))
-            L_sigma_mean.append((L_sigma_x[-1]+L_sigma_y[-1]+L_sigma_z[-1])/3)
-            L_confinement.append(data[i][3])
-            L_coordination.append(data[i][4])
-            L_n_bond.append(data[i][5])
-            L_ite.append(data[i][6])
-            L_strain_x.append(data[i][8])
-            L_strain_y.append(data[i][9])
-            L_strain_z.append(data[i][10])
-            L_strain_vol.append(L_strain_x[-1]+L_strain_y[-1]+L_strain_z[-1])
-            L_unbalanced.append(data[i][11])
-
-        # plot
-        fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(20,10),num=1)
-
-        ax1.plot(L_ite, L_sigma_x, label = r'$\sigma_x$')
-        ax1.plot(L_ite, L_sigma_y, label = r'$\sigma_y$')
-        ax1.plot(L_ite, L_sigma_z, label = r'$\sigma_z$')
-        ax1.plot(L_ite, L_sigma_mean, label = r'$\sigma_{mean}$')
-        ax1.legend()
-        ax1.set_title('Stresses (Pa)')
-
-        ax2.plot(L_ite, L_unbalanced, 'b')
-        ax2.set_ylabel('Unbalanced (-)', color='b')
-        ax2.set_ylim(ymin=0, ymax=2*unbalancedForce_criteria)
-        ax2b = ax2.twinx()
-        ax2b.plot(L_ite, L_confinement, 'r')
-        ax2b.set_ylabel('Confinement (%)', color='r')
-        ax2b.set_ylim(ymin=0, ymax=150)
-        ax2b.set_title('Steady-state indices')
-
-        ax3.plot(L_ite, L_n_bond)
-        ax3.set_title('Number of bond (-)')
-
-        ax4.plot(L_ite, L_strain_x, label=r'$\epsilon_x$ (%)')
-        ax4.plot(L_ite, L_strain_y, label=r'$\epsilon_y$ (%)')
-        ax4.plot(L_ite, L_strain_z, label=r'$\epsilon_z$ (%)')
-        ax4.legend()
-        ax4.set_title('Strains (%)')
-
-        ax5.plot(L_ite, L_strain_vol)
-        ax5.set_title('Volumeric strain (%)')
-
-        ax6.plot(L_ite, L_coordination)
-        ax6.set_title('Coordination number (-)')
-
-        plt.savefig('plot/IC_'+O.tags['d.id']+'.png')
-
-        plt.close()
-
-#-------------------------------------------------------------------------------
-
 def checkUnbalanced_load_cementation_ic():
     '''
     Wait to reach the confining pressure targetted for cementation.
@@ -528,6 +448,89 @@ def addPlotData_cementation_ic():
 
 #-------------------------------------------------------------------------------
 
+def saveData_ic():
+    """
+    Save data in .txt file during the ic.
+    """
+    plot.saveDataTxt('data_'+O.tags['d.id']+'/confinement_'+O.tags['d.id']+'.txt')
+    # post-proccess
+    L_sigma_x = []
+    L_sigma_y = []
+    L_sigma_z = []
+    L_sigma_mean = []
+    L_confinement = []
+    L_coordination = []
+    L_unbalanced = []
+    L_ite  = []
+    L_strain_x = []
+    L_strain_y = []
+    L_strain_z = []
+    L_strain_vol = []
+    L_n_bond = []
+    file = 'data_'+O.tags['d.id']+'/confinement_'+O.tags['d.id']+'.txt'
+    data = np.genfromtxt(file, skip_header=1)
+    file_read = open(file, 'r')
+    lines = file_read.readlines()
+    file_read.close()
+    if len(lines) >= 3:
+        for i in range(len(data)):
+            L_sigma_x.append(abs(data[i][0]))
+            L_sigma_y.append(abs(data[i][1]))
+            L_sigma_z.append(abs(data[i][2]))
+            L_sigma_mean.append((L_sigma_x[-1]+L_sigma_y[-1]+L_sigma_z[-1])/3)
+            L_confinement.append(data[i][3])
+            L_coordination.append(data[i][4])
+            L_n_bond.append(data[i][5])
+            L_ite.append(data[i][6])
+            L_strain_x.append(data[i][8])
+            L_strain_y.append(data[i][9])
+            L_strain_z.append(data[i][10])
+            L_strain_vol.append(L_strain_x[-1]+L_strain_y[-1]+L_strain_z[-1])
+            L_unbalanced.append(data[i][11])
+
+        # plot
+        fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2,3, figsize=(20,10),num=1)
+
+        ax1.plot(L_ite, L_sigma_x, label = r'$\sigma_x$')
+        ax1.plot(L_ite, L_sigma_y, label = r'$\sigma_y$')
+        ax1.plot(L_ite, L_sigma_z, label = r'$\sigma_z$')
+        ax1.plot(L_ite, L_sigma_mean, label = r'$\sigma_{mean}$')
+        ax1.legend()
+        ax1.set_title('Stresses (Pa)')
+
+        ax2.plot(L_ite, L_unbalanced, 'b')
+        ax2.set_ylabel('Unbalanced (-)', color='b')
+        ax2.set_ylim(ymin=0, ymax=2*unbalancedForce_criteria)
+        ax2b = ax2.twinx()
+        ax2b.plot(L_ite, L_confinement, 'r')
+        ax2b.set_ylabel('Confinement (%)', color='r')
+        ax2b.set_ylim(ymin=0, ymax=150)
+        ax2b.set_title('Steady-state indices')
+
+        ax3.plot(L_ite, L_n_bond)
+        ax3.set_title('Number of bond (-)')
+
+        ax4.plot(L_ite, L_strain_x, label=r'$\epsilon_x$ (%)')
+        ax4.plot(L_ite, L_strain_y, label=r'$\epsilon_y$ (%)')
+        ax4.plot(L_ite, L_strain_z, label=r'$\epsilon_z$ (%)')
+        ax4.legend()
+        ax4.set_title('Strains (%)')
+
+        ax5.plot(L_ite, L_strain_vol)
+        ax5.set_title('Volumeric strain (%)')
+
+        ax6.plot(L_ite, L_coordination)
+        ax6.set_title('Coordination number (-)')
+
+        plt.savefig('plot_'+O.tags['d.id']+'/confinement__'+O.tags['d.id']+'.png')
+
+        plt.close()
+
+
+#-------------------------------------------------------------------------------
+#Cementation
+#-------------------------------------------------------------------------------
+
 def cementation():
     '''
     Generate cementation between grains.
@@ -625,6 +628,34 @@ def bsd_tengatini2023():
 
     return L_cum_p_size, L_p_size, L_size
 
+#-------------------------------------------------------------------------------
+
+def compute_margin():
+    '''
+    Compute the margin of the bonds before the rupture.
+
+    The maximum between the tensile and shear is considered.
+    '''
+    # compute the margin for the bonds (force/stiffness) 
+    margin_bond = 0
+    counter_margin = 0
+    for i in O.interactions:
+        if isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere):
+            if not i.phys.cohesionBroken :
+                # tensile margin
+                if i.geom.penetrationDepth < 0:
+                    tensile_margin = np.linalg.norm(i.phys.normalForce)/i.phys.normalAdhesion
+                else :
+                    tensile_margin = 0
+                # shear margin 
+                shear_margin = np.linalg.norm(i.phys.shearForce)/(i.phys.shearAdhesion+i.phys.tangensOfFrictionAngle*np.linalg.norm(i.phys.normalForce))
+                # take the maximum (largest potential to crack)
+                margin_bond = margin_bond + max(tensile_margin, shear_margin)
+                counter_margin = counter_margin + 1
+    return margin_bond/counter_margin
+
+#-------------------------------------------------------------------------------
+#Isotropic confinement until P_confinement
 #-------------------------------------------------------------------------------
 
 def controlWalls_ic_b():
@@ -917,44 +948,6 @@ def checkUnbalanced():
     if (O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2])-(O.bodies[5].state.pos[2]-O.bodies[4].state.pos[2])/(O.bodies[5].state.refPos[2]-O.bodies[4].state.refPos[2]) > \
         vert_strain_load:
         stopLoad()
-    
-#-------------------------------------------------------------------------------
-
-def stopLoad():
-    """
-    Close simulation.
-    """
-    # close yade
-    O.pause()
-    # characterize the dem step
-    tac = time.perf_counter()
-    hours = (tac-tic)//(60*60)
-    minutes = (tac-tic -hours*60*60)//(60)
-    seconds = int(tac-tic -hours*60*60 -minutes*60)
-    # report
-    simulation_report = open(simulation_report_name, 'a')
-    simulation_report.write("Triaxial loading test : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
-    simulation_report.write(str(count_bond())+" contacts cemented finally\n\n")
-    simulation_report.close()
-    print("Triaxial loading test : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
-    print('\n'+str(count_bond())+" contacts cemented\n")
-    # characterize the last DEM step and the simulation
-    hours = (tac-tic_0)//(60*60)
-    minutes = (tac-tic_0 -hours*60*60)//(60)
-    seconds = int(tac-tic_0 -hours*60*60 -minutes*60)
-    # report
-    simulation_report = open(simulation_report_name, 'a')
-    simulation_report.write("Simulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n\n")
-    simulation_report.close()
-    print("\nSimulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
-
-    # save simulation
-    save_folder = 'Data_Tengattini2023/'+O.tags['d.id']
-    os.mkdir(save_folder)
-    shutil.move('data_'+O.tags['d.id'],save_folder+'/data')
-    shutil.move('plot_'+O.tags['d.id'],save_folder+'/plot')
-    shutil.move(O.tags['d.id']+'_report.txt', save_folder+'/'+O.tags['d.id']+'_report.txt')
-    shutil.copy('dem_subsets.py',save_folder+'/dem_subsets.py')
 
 #-------------------------------------------------------------------------------
 
@@ -1104,29 +1097,41 @@ def SavePlot_data():
 
 #-------------------------------------------------------------------------------
 
-def compute_margin():
-    '''
-    Compute the margin of the bonds before the rupture.
+def stopLoad():
+    """
+    Close simulation.
+    """
+    # close yade
+    O.pause()
+    # characterize the dem step
+    tac = time.perf_counter()
+    hours = (tac-tic)//(60*60)
+    minutes = (tac-tic -hours*60*60)//(60)
+    seconds = int(tac-tic -hours*60*60 -minutes*60)
+    # report
+    simulation_report = open(simulation_report_name, 'a')
+    simulation_report.write("Triaxial loading test : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
+    simulation_report.write(str(count_bond())+" contacts cemented finally\n\n")
+    simulation_report.close()
+    print("Triaxial loading test : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
+    print('\n'+str(count_bond())+" contacts cemented\n")
+    # characterize the last DEM step and the simulation
+    hours = (tac-tic_0)//(60*60)
+    minutes = (tac-tic_0 -hours*60*60)//(60)
+    seconds = int(tac-tic_0 -hours*60*60 -minutes*60)
+    # report
+    simulation_report = open(simulation_report_name, 'a')
+    simulation_report.write("Simulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n\n")
+    simulation_report.close()
+    print("\nSimulation time : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds\n")
 
-    The maximum between the tensile and shear is considered.
-    '''
-    # compute the margin for the bonds (force/stiffness) 
-    margin_bond = 0
-    counter_margin = 0
-    for i in O.interactions:
-        if isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere):
-            if not i.phys.cohesionBroken :
-                # tensile margin
-                if i.geom.penetrationDepth < 0:
-                    tensile_margin = np.linalg.norm(i.phys.normalForce)/i.phys.normalAdhesion
-                else :
-                    tensile_margin = 0
-                # shear margin 
-                shear_margin = np.linalg.norm(i.phys.shearForce)/(i.phys.shearAdhesion+i.phys.tangensOfFrictionAngle*np.linalg.norm(i.phys.normalForce))
-                # take the maximum (largest potential to crack)
-                margin_bond = margin_bond + max(tensile_margin, shear_margin)
-                counter_margin = counter_margin + 1
-    return margin_bond/counter_margin
+    # save simulation
+    save_folder = 'Data_Tengattini2023/'+O.tags['d.id']
+    os.mkdir(save_folder)
+    shutil.move('data_'+O.tags['d.id'],save_folder+'/data')
+    shutil.move('plot_'+O.tags['d.id'],save_folder+'/plot')
+    shutil.move(O.tags['d.id']+'_report.txt', save_folder+'/'+O.tags['d.id']+'_report.txt')
+    shutil.copy('dem_subsets.py',save_folder+'/dem_subsets.py')
 
 #-------------------------------------------------------------------------------
 # start simulation
