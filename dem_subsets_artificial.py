@@ -623,7 +623,7 @@ def bsd_tengatini2023():
     ax1.scatter(L_ref_size, L_ref_cum_prob, color='k')
     ax1.set_ylabel('cumulative percentage (-)')
     ax1.set_ylabel(r'bond size ($\mu m^2$)')
-    fig.savefig('plot/BSD.png')
+    fig.savefig('plot_'+O.tags['d.id']+'/BSD.png')
     plt.close()
 
     return L_cum_p_size, L_p_size, L_size
