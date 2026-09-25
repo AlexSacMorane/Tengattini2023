@@ -91,7 +91,7 @@ O.engines = [
                 # Law : compute contact law with parameters from Ip
                 [Ig2_Sphere_Sphere_ScGeom6D(), Ig2_Wall_Sphere_ScGeom()],
                 [Ip2_CohFrictMat_CohFrictMat_CohFrictPhys(setCohesionNow=False, setCohesionOnNewContacts=False, label="physFunctor"), Ip2_FrictMat_FrictMat_FrictPhys()],
-                [Law2_ScGeom6D_CohFrictPhys_CohesionMoment(always_use_moment_law=True, neverErase=True), Law2_ScGeom_FrictPhys_CundallStrack()]
+                [Law2_ScGeom6D_CohFrictPhys_CohesionMoment(always_use_moment_law=True, neverErase=False), Law2_ScGeom_FrictPhys_CundallStrack()]
         ),
         NewtonIntegrator(gravity=(0, 0, 0), damping=0.001, label = 'Newton'),
         PyRunner(command='checkUnbalanced_ir_ic()', iterPeriod = 200, label='checker')
