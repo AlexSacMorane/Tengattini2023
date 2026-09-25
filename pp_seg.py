@@ -75,6 +75,8 @@ vtk_name.close()
 # prepare the data 
 L_pos_all = []
 L_rad_all = []
+L_S_cement_all = []
+L_S_cement_weighted_all = []
 # compute stats
 L_n_grains = []
 L_n_cemented_contacts = []
@@ -144,18 +146,73 @@ for seg in L_seg:
     i_z_min = L_coord[4]
 
     # pp and save the data
-    vol = 0
+    vol = 0 # used for the porosity
+    # iterate on grain
     for i_pos in range(len(dict_seg['L_pos_pixel'])):
         L_pos_all.append([dict_seg['L_pos_pixel'][i_pos][0]+i_x_min,
                           dict_seg['L_pos_pixel'][i_pos][1]+i_y_min,
                           dict_seg['L_pos_pixel'][i_pos][2]+i_z_min])
         L_rad_all.append(dict_seg['L_rad_pixel'][i_pos])
         vol = vol + 4*math.pi/3*dict_seg['L_rad_pixel'][i_pos]**3
+    # iterate on bond
+    for i_contact in range(len(dict_seg['L_S_cement_pixel'])):
+        L_S_cement_all.append(dict_seg['L_S_cement_pixel'][i_contact])
+        L_S_cement_weighted_all.append(dict_seg['L_S_cement_weighted_pixel'][i_contact])
 
     # save data
     L_n_grains.append(len(dict_seg['L_pos_pixel']))
     L_n_cemented_contacts.append(len(dict_seg['L_S_cement_pixel']))
     L_porosity.append(1-vol/((L_coord[1]-L_coord[0])*(L_coord[3]-L_coord[2])*(L_coord[5]-L_coord[4])))
+
+#-------------------------------------------------------------------------------
+#Plot BSD and PSD considering all
+#-------------------------------------------------------------------------------
+
+# compute the distribution of the cement area
+L_n_S_cement_all_pp, L_cum_n_S_cement_all_pp = compute_distribution(L_S_cement_all, L_S_cement_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+# plot
+fig, ax = plt.subplots(1,1, figsize=(16, 9))
+ax.plot(L_S_cement_pp[:-1], L_cum_n_S_cement_all_pp)
+ax1_bsd.plot(L_S_cement_pp[:-1], L_cum_n_S_cement_all_pp, color='k', linewidth=6) # with all plot
+ax.set_xlabel('sectional surface (pixel^2)')
+ax.set_ylabel('cumulative probability (-)')
+fig.tight_layout()
+fig.savefig('pp/bond_size_distribution_all.png')
+plt.close()
+
+# print user
+print('cement surface (surface-cumulative probability)')
+print(L_S_cement_pp[:-1])
+print(L_cum_n_S_cement_all_pp)
+
+# compute the distribution of the cement area
+L_n_S_cement_weighted_all_pp, L_cum_n_S_cement_weighted_all_pp = compute_distribution(L_S_cement_weighted_all, L_S_cement_weighted_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+# plot
+fig, ax = plt.subplots(1,1, figsize=(16, 9))
+ax.plot(L_S_cement_weighted_pp[:-1], L_cum_n_S_cement_weighted_all_pp)
+ax1_wbsd.plot(L_S_cement_weighted_pp[:-1], L_cum_n_S_cement_weighted_all_pp, color='k', linewidth=6) # with all plot
+ax.set_xlabel('sectional surface (pixel^2)')
+ax.set_ylabel('cumulative probability (-)')
+fig.tight_layout()
+fig.savefig('pp/weighted_bond_size_distribution_all.png')
+plt.close()
+
+# print user
+print('cement surface weighted (surface-cumulative probability)')
+print(L_S_cement_weighted_pp[:-1])
+print(L_cum_n_S_cement_weighted_all_pp)
+
+# compute the distribution of the particle size
+L_n_radius_all_pp, L_cum_n_radius_all_pp = compute_distribution(L_rad_all, L_radius_pp, np.zeros((n_pp-1,)), np.zeros((n_pp-1,)))
+# plot
+fig, ax = plt.subplots(1,1, figsize=(16, 9))
+ax.plot(L_radius_pp[:-1], L_cum_n_radius_all_pp)
+ax1_psd.plot(L_radius_pp[:-1], L_cum_n_radius_all_pp, linewidth=6, color='k') # with all plot
+ax.set_xlabel('grain radius (pixel)')
+ax.set_ylabel('cumulative probability (-)')
+fig.tight_layout()
+fig.savefig('pp/particle_size_distribution_all.png')
+plt.close()
 
 #-------------------------------------------------------------------------------
 #Close plot
@@ -211,7 +268,6 @@ ax1_p.set_ylabel('occurences (-)')
 fig_p.tight_layout()
 fig_p.savefig('pp/hist_porosity.png')
 plt.close()
-
 
 #-------------------------------------------------------------------------------
 #write the vtk
