@@ -236,8 +236,6 @@ def checkUnbalanced_ir_ic():
     simulation_report.close()
     print("\nIC Generated : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
     print('next step is the application of the cementation confinement\n')
-    # save
-    #O.save('save/simu_ic.yade.bz2')
     # next time, do not call this function anymore, but the next one instead
     iter_0 = O.iter
     checker.command = 'checkUnbalanced_load_cementation_ic()'
@@ -497,8 +495,6 @@ def checkUnbalanced_param_ic():
     simulation_report.close()
     print("\nParameters applied : "+str(hours)+" hours "+str(minutes)+" minutes "+str(seconds)+" seconds")
     print('next step is the cementation\n')
-    # save
-    #O.save('save/'+O.tags['d.id']+'_ic.yade.bz2')
     # next time, do not call this function anymore, but the next one instead
     checker.command = 'cementation()'
     checker.iterPeriod = 10
