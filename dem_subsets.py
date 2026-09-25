@@ -143,8 +143,13 @@ for i_grain in range(len(dict_seg['L_pos_pixel'])):
 # generate cement
 # count the bond
 counter_bond0 = 0
+# select the cementation distribution
+flag_cement_weighted = False
 # compute the mean cement surface
-mean_cohesiveSurface = np.mean(dict_seg['L_S_cement_weighted_pixel'])*pixel_to_m*pixel_to_m
+if flag_cement_weighted:
+    mean_cohesiveSurface = np.mean(dict_seg['L_S_cement_weighted_pixel'])*pixel_to_m*pixel_to_m
+else:
+    mean_cohesiveSurface = np.mean(dict_seg['L_S_cement_pixel'])*pixel_to_m*pixel_to_m
 # iterate on the segmentation
 for i_bond in range(len(dict_seg['L_ij_contact'])):
     counter_bond0 = counter_bond0 + 1
@@ -155,7 +160,10 @@ for i_bond in range(len(dict_seg['L_ij_contact'])):
     i = createInteraction(id_body_i, id_body_j)
     physFunctor.setCohesion(i, cohesive=True, resetDisp=True)
     # determine the cohesive surface
-    cohesiveSurface = dict_seg['L_S_cement_weighted_pixel'][i_bond]*pixel_to_m*pixel_to_m # m2
+    if flag_cement_weighted:
+        cohesiveSurface = dict_seg['L_S_cement_weighted_pixel'][i_bond]*pixel_to_m*pixel_to_m # m2
+    else:
+        cohesiveSurface = dict_seg['L_S_cement_pixel'][i_bond]*pixel_to_m*pixel_to_m # m2
     # set normal and shear adhesions
     i.phys.normalAdhesion = tensileCohesion*cohesiveSurface*f_artificial
     i.phys.shearAdhesion = shearCohesion*cohesiveSurface*f_artificial
