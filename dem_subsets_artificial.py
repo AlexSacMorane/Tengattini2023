@@ -583,13 +583,20 @@ def bsd_tengatini2023():
     '''
     Define the weight of a bond size from (Tengattini, 2023).
     '''
-    # reference
-    L_ref_size     = [0, 0.182e4, 0.364e4, 0.546e4]
-    L_ref_cum_prob = [0,    0.70,    0.90,       1]
+    # reference (not weighted) /!\ it is in pixel^2 
+    L_ref_size     = [  0., 7.89, 15.8, 23.7, 31.6, 39.5, 47.4, 55.3, 63.2, 71.1, 78.9, 86.8, 94.7, 103.]
+    L_ref_cum_prob = [0.00, 0.02, 0.09, 0.22, 0.38, 0.55, 0.69, 0.81, 0.89, 0.94, 0.96, 0.98, 0.99, 1.00]
     
+    # reference (weighted) /!\ it is in pixel^2
+    #L_ref_size     = [  0., 1.84, 3.68, 5.53, 7.37, 9.21, 11.1, 12.9, 14.7, 16.6, 18.4, 20.3, 22.1, 24.0, 25.8, 27.6, 31.3, 33.2]
+    #L_ref_cum_prob = [0.00, 0.04, 0.12, 0.28, 0.42, 0.56, 0.66, 0.74, 0.80, 0.85, 0.89, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
+
+    # convert pixel^2 -> µm2
+    L_ref_size = list(np.array(L_ref_size)*pixel_to_um*pixel_to_um)
+
     # input 
-    size_min = 0.010e4 # µm2
-    size_max = 0.546e4 # µm2
+    size_min = 0.1e4 # µm2
+    size_max = 1.8e4 # µm2
     n_size = 100
     L_size = np.linspace(size_min, size_max, n_size)
 
