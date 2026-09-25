@@ -56,7 +56,7 @@ mk_new_dir('pp')
 # prepare the plot
 n_pp = 20
 L_S_cement_pp = np.linspace(0, 150, n_pp)
-L_S_cement_weighted_pp = np.linspace(0, 60, n_pp)
+L_S_cement_weighted_pp = np.linspace(0, 35, n_pp)
 L_radius_pp = np.linspace(0, 30, n_pp)
 
 # plot BSD
