@@ -432,7 +432,7 @@ def SavePlot_data_confinement():
 
         ax2.plot(L_ite, L_unbalanced, 'b')
         ax2.set_ylabel('Unbalanced (-)', color='b')
-        ax2b.tick_params(axis='y', labelcolor='b')
+        ax2.tick_params(axis='y', labelcolor='b')
         ax2.set_ylim(ymin=0, ymax=2*unbalancedForce_criteria)
         ax2b = ax2.twinx()
         ax2b.plot(L_ite, L_confinement, 'r')
