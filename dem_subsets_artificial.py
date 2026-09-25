@@ -537,10 +537,12 @@ def cementation():
     # iterate on interactions
     for i in O.interactions:
         # only grain-grain contact can be cemented
-        if isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere) :
+        if (isinstance(O.bodies[i.id1].shape, Sphere) and isinstance(O.bodies[i.id2].shape, Sphere)) and\
+            i.isActive and i.isReal:
             counter_bond0 = counter_bond0 + 1
             # creation of cohesion
-            i.phys.cohesionBroken = False
+            physFunctor.setCohesion(i, cohesive=True, resetDisp=False)
+            #i.phys.cohesionBroken = False
             # determine the cohesive surface
             cohesiveSurface = random.choices(x_L, cum_weights=cum_p_x_L)[0]*1e-12 # m2
             # set normal and shear adhesions
@@ -552,6 +554,7 @@ def cementation():
             i.phys.ks = poisson_particle*localYoungModulus*(O.bodies[i.id1].shape.radius*2*O.bodies[i.id2].shape.radius*2)/(O.bodies[i.id1].shape.radius*2+O.bodies[i.id2].shape.radius*2) 
             i.phys.kr = i.phys.ks*alphaKrReal*O.bodies[i.id1].shape.radius*O.bodies[i.id2].shape.radius
             i.phys.ktw = i.phys.ks*alphaKtwReal*O.bodies[i.id1].shape.radius*O.bodies[i.id2].shape.radius
+    
     # write in the report
     simulation_report = open(simulation_report_name, 'a')
     simulation_report.write(str(counter_bond0)+" contacts cemented initially\n\n")
